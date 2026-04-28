@@ -2,1366 +2,1154 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Luffy's Gym Routine</title>
-<meta name="description" content="Luffy's personal 5-day gym routine tracker">
-<meta name="theme-color" content="#e8ff47">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d0f0e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Luffy Gym">
+<meta name="apple-mobile-web-app-title" content="My Gym Plan">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>My Gym Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0d0d;
-    --card: #161616;
-    --card2: #1e1e1e;
-    --accent: #e8ff47;
-    --accent2: #ff6b35;
-    --accent3: #47c9ff;
-    --text: #f0f0f0;
-    --muted: #888;
-    --border: #2a2a2a;
+    --bg: #0d0f0e;
+    --surface: #151918;
+    --card: #1b1f1e;
+    --card-hover: #202524;
+    --border: #2a302e;
+    --accent: #b5ff47;
+    --accent2: #47ffd4;
+    --accent3: #ff6b35;
+    --text: #e8ede9;
+    --muted: #7a8a7e;
+    --red: #ff4757;
+    --done-bg: rgba(181,255,71,0.06);
+    --done-border: rgba(181,255,71,0.25);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html { scroll-behavior: smooth; }
 
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
     min-height: 100vh;
-    padding-bottom: 100px;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Header */
-  .header {
-    background: linear-gradient(135deg, #0d0d0d 0%, #1a1a00 100%);
-    padding: 28px 20px 20px;
-    border-bottom: 2px solid var(--accent);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(181,255,71,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 90%, rgba(71,255,212,0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
   }
 
-  .header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 16px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  .hero {
+    text-align: center;
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 10vw, 80px);
+    letter-spacing: 2px;
+    line-height: 0.95;
+    color: var(--text);
     margin-bottom: 16px;
   }
 
-  .logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 38px;
-    color: var(--accent);
-    letter-spacing: 2px;
-    line-height: 1;
-  }
+  .hero h1 span { color: var(--accent); }
 
-  .logo span { color: var(--text); }
-
-  .bmi-badge {
-    background: var(--accent);
-    color: #0d0d0d;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 20px;
-    letter-spacing: 0.5px;
-    margin-top: 6px;
-  }
-
-  /* Day Tabs */
-  .tabs {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    scrollbar-width: none;
-  }
-  .tabs::-webkit-scrollbar { display: none; }
-
-  .tab {
-    flex-shrink: 0;
-    padding: 8px 16px;
-    border-radius: 30px;
-    border: 1.5px solid var(--border);
-    background: transparent;
+  .hero-sub {
     color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
+    font-size: 14px;
+    max-width: 460px;
+    margin: 0 auto 28px;
   }
 
-  .tab.active {
-    background: var(--accent);
-    color: #0d0d0d;
-    border-color: var(--accent);
-  }
-
-  .tab.rest {
-    border-color: #333;
-    color: #444;
-    cursor: default;
-  }
-
-  /* Main content */
-  .content { padding: 20px 16px; }
-
-  .day-header {
-    margin-bottom: 20px;
-  }
-
-  .day-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 48px;
-    line-height: 1;
-    color: var(--text);
-    letter-spacing: 1px;
-  }
-
-  .day-subtitle {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 4px;
-    font-weight: 400;
-  }
-
-  .day-meta {
+  .stats-row {
     display: flex;
     gap: 10px;
-    margin-top: 12px;
+    justify-content: center;
     flex-wrap: wrap;
   }
 
-  .meta-pill {
-    background: var(--card2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-  }
-
-  .meta-pill.highlight { border-color: var(--accent); color: var(--accent); }
-
-  /* Section */
-  .section {
-    margin-bottom: 24px;
-  }
-
-  .section-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .section-label::before {
-    content: '';
-    width: 3px;
-    height: 14px;
-    border-radius: 2px;
-  }
-
-  .section-label.warmup::before { background: var(--accent3); }
-  .section-label.lower::before { background: var(--accent2); }
-  .section-label.core::before { background: var(--accent); }
-  .section-label.cardio::before { background: #b47eff; }
-
-  /* Exercise Card */
-  .exercise-card {
+  .stat-chip {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 16px;
+    border-radius: 40px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .stat-chip strong { color: var(--accent); }
+
+  /* ── PROGRESS BAR ── */
+  .progress-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-bottom: 36px;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .progress-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+  }
+
+  .progress-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  .progress-bar-track {
+    background: var(--border);
+    border-radius: 8px;
+    height: 8px;
+    overflow: hidden;
     margin-bottom: 10px;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  .progress-sub {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .reset-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+
+  .reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── SECTION ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 2px 8px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+  }
+
+  section { margin-bottom: 52px; }
+
+  /* ── PHASE BANNER ── */
+  .phase-banner {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 14px;
-    transition: all 0.2s;
+    flex-wrap: wrap;
+  }
+
+  .phase-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .phase-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+  }
+
+  .phase-duration {
+    margin-left: auto;
+    background: rgba(181,255,71,0.1);
+    color: var(--accent);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── WEEK GRID ── */
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  /* ── DAY CARD ── */
+  .day-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    transition: border-color 0.2s, transform 0.2s, background 0.3s;
     position: relative;
     overflow: hidden;
   }
 
-  .exercise-card.done {
-    opacity: 0.45;
-    border-color: #1e1e1e;
+  .day-card:hover { border-color: rgba(181,255,71,0.4); transform: translateY(-2px); }
+
+  .day-card.rest { border-style: dashed; }
+
+  .day-card.completed {
+    background: var(--done-bg);
+    border-color: var(--done-border);
+    border-style: solid;
   }
 
-  .exercise-card.done::after {
-    content: '✓';
+  .day-card.completed .day-name { color: var(--accent); }
+
+  /* Completion shimmer */
+  .day-card.completed::after {
+    content: '';
     position: absolute;
-    right: 16px;
-    font-size: 18px;
-    color: var(--accent);
-    font-weight: 700;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(181,255,71,0.04) 100%);
+    pointer-events: none;
   }
 
-  .ex-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    color: var(--border);
-    width: 28px;
-    flex-shrink: 0;
-    text-align: center;
+  .day-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
   }
 
-  .ex-body { flex: 1; }
-
-  .ex-name {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-
-  .ex-tip {
-    font-size: 12px;
+  .day-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
     color: var(--muted);
-    font-weight: 400;
+    text-transform: uppercase;
   }
 
-  .ex-reps {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 1px;
-    flex-shrink: 0;
-    text-align: right;
-  }
-
-  .ex-reps.blue { color: var(--accent3); }
-  .ex-reps.orange { color: var(--accent2); }
-  .ex-reps.yellow { color: var(--accent); }
-  .ex-reps.purple { color: #b47eff; }
-
+  /* ── CHECK BUTTON ── */
   .check-btn {
     width: 28px;
     height: 28px;
     border-radius: 50%;
     border: 2px solid var(--border);
-    background: transparent;
+    background: none;
     cursor: pointer;
-    flex-shrink: 0;
-    transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .check-btn:active {
-    transform: scale(0.9);
-    background: var(--accent);
-    border-color: var(--accent);
-  }
-
-  /* Treadmill special card */
-  .treadmill-card {
-    background: linear-gradient(135deg, #1a0a00, #1e1e1e);
-    border: 1.5px solid var(--accent2);
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 10px;
-  }
-
-  .treadmill-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    color: var(--accent2);
-    letter-spacing: 1px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .treadmill-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .t-cell {
-    background: rgba(255,255,255,0.04);
-    border-radius: 10px;
-    padding: 10px 12px;
-    border: 1px solid #2a2a2a;
-  }
-
-  .t-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    flex-shrink: 0;
     color: var(--muted);
-    margin-bottom: 4px;
-    font-weight: 600;
-  }
-
-  .t-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    color: var(--text);
-    letter-spacing: 1px;
-  }
-
-  .t-value span {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    color: var(--muted);
-    font-weight: 400;
-  }
-
-  .t-note {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 10px;
-    line-height: 1.5;
-  }
-
-  /* Cardio card */
-  .cardio-row {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .cardio-name {
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  .cardio-time {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    color: #b47eff;
-    letter-spacing: 1px;
-  }
-
-  /* Rest day */
-  .rest-day {
-    text-align: center;
-    padding: 60px 20px;
-  }
-
-  .rest-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
-  }
-
-  .rest-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 42px;
-    color: var(--muted);
-    letter-spacing: 2px;
-  }
-
-  .rest-text {
-    color: var(--muted);
-    font-size: 14px;
-    margin-top: 8px;
-    line-height: 1.6;
-  }
-
-  /* Progress bar */
-  .progress-wrap {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    height: 6px;
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-
-  .progress-bar {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 50px;
-    transition: width 0.4s ease;
-  }
-
-  .progress-label {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 6px;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  /* Sat special */
-  .sat-note {
-    background: linear-gradient(135deg, #0a001a, #1e1e1e);
-    border: 1.5px solid #b47eff;
-    border-radius: 14px;
-    padding: 14px 16px;
-    margin-bottom: 16px;
     font-size: 13px;
-    color: #c9a0ff;
-    line-height: 1.6;
   }
 
-  .hidden { display: none; }
+  .check-btn:hover {
+    border-color: var(--accent);
+    background: rgba(181,255,71,0.1);
+    color: var(--accent);
+    transform: scale(1.1);
+  }
+
+  .check-btn.checked {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 0 12px rgba(181,255,71,0.4);
+  }
+
+  .check-btn.checked:hover {
+    background: rgba(181,255,71,0.7);
+    transform: scale(1.1);
+  }
+
+  .day-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 17px;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+    transition: color 0.3s;
+  }
+
+  .day-focus {
+    font-size: 11px;
+    color: var(--accent2);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  .day-card.rest .day-focus { color: var(--muted); }
+
+  .exercise-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .exercise-list li {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+  }
+
+  .exercise-list li::before {
+    content: '→';
+    color: var(--accent);
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  .exercise-list li span { color: var(--text); font-weight: 500; }
+
+  .cardio-badge {
+    display: inline-block;
+    background: rgba(255,107,53,0.15);
+    color: var(--accent3);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    margin-left: 3px;
+    vertical-align: middle;
+  }
+
+  .hiit-badge {
+    display: inline-block;
+    background: rgba(255,71,87,0.12);
+    color: #ff6b6b;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    margin-left: 3px;
+    vertical-align: middle;
+  }
+
+  /* ── CALORIE BOX ── */
+  .calorie-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 14px 0;
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .calorie-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 34px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .calorie-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  /* ── WARNING ── */
+  .warning {
+    background: rgba(255,71,87,0.08);
+    border: 1px solid rgba(255,71,87,0.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #ff8a94;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 14px;
+  }
+
+  .warning::before { content: '⚠️'; flex-shrink: 0; }
+
+  .tip-box {
+    background: rgba(71,255,212,0.06);
+    border: 1px solid rgba(71,255,212,0.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--accent2);
+    margin-bottom: 20px;
+  }
+
+  /* ── INFO GRID ── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 12px;
+  }
+
+  .info-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .info-card .icon { font-size: 22px; margin-bottom: 10px; display: block; }
+  .info-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 1px; margin-bottom: 8px; }
+  .info-card p, .info-card li { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .info-card ul { list-style: none; }
+  .info-card ul li::before { content: '• '; color: var(--accent); }
+
+  /* ── NUTRITION TABLE ── */
+  .watch-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 12px;
+  }
+
+  .watch-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; margin-bottom: 14px; }
+
+  .nutrition-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .nutrition-table th { text-align: left; padding: 10px 14px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+  .nutrition-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; }
+  .nutrition-table td:first-child { font-weight: 500; color: var(--text); }
+  .nutrition-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .macro-highlight { background: rgba(181,255,71,0.08); color: var(--accent); border-radius: 4px; padding: 2px 7px; font-family: 'DM Mono', monospace; font-size: 11px; }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: var(--border); }
+  .timeline-item { position: relative; margin-bottom: 24px; }
+  .timeline-item::before { content: ''; position: absolute; left: -25px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px rgba(181,255,71,0.5); }
+  .timeline-item.done::before { background: var(--muted); box-shadow: none; }
+  .timeline-item.done { opacity: 0.5; }
+  .timeline-item.current::before { background: var(--accent2); box-shadow: 0 0 12px rgba(71,255,212,0.6); animation: pulse 2s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(71,255,212,0.6); }
+    50% { box-shadow: 0 0 18px rgba(71,255,212,0.9); }
+  }
+
+  .timeline-week { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 2px; margin-bottom: 3px; }
+  .timeline-title { font-weight: 600; color: var(--text); margin-bottom: 3px; font-size: 14px; }
+  .timeline-desc { font-size: 12px; color: var(--muted); }
+
+  /* ── WATCH STEPS ── */
+  .watch-steps { display: flex; flex-direction: column; gap: 12px; }
+  .watch-step { display: flex; gap: 14px; align-items: flex-start; }
+  .step-num { background: var(--accent); color: var(--bg); border-radius: 50%; width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 700; }
+  .watch-step-content strong { display: block; font-size: 13px; color: var(--text); margin-bottom: 2px; }
+  .watch-step-content p { font-size: 12px; color: var(--muted); }
+
+  /* ── DIVIDER ── */
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 44px 0; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 10px 22px;
+    border-radius: 40px;
+    font-weight: 700;
+    z-index: 999;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── GOAL CARD ── */
+  .goal-card {
+    background: linear-gradient(135deg, rgba(181,255,71,0.07), rgba(71,255,212,0.04));
+    border: 1px solid rgba(181,255,71,0.18);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .goal-card h2 { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 2px; margin-bottom: 6px; }
+  .goal-card p { color: var(--muted); font-size: 13px; max-width: 440px; margin: 0 auto; }
+  .goal-numbers { display: flex; justify-content: center; gap: 36px; margin: 20px 0; flex-wrap: wrap; }
+  .goal-num { text-align: center; }
+  .goal-num .big { font-family: 'Bebas Neue', sans-serif; font-size: 44px; line-height: 1; display: block; }
+  .goal-num .big.green { color: var(--accent); }
+  .goal-num .big.cyan { color: var(--accent2); }
+  .goal-num .big.orange { color: var(--accent3); }
+  .goal-num small { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 1px; }
+
+  .footer-text { text-align: center; padding: 36px 0 16px; color: var(--muted); font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 1px; }
+
+  @media (max-width: 600px) {
+    .week-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 52px; }
+    .goal-numbers { gap: 20px; }
+    .calorie-box { gap: 14px; }
+  }
 </style>
 </head>
 <body>
+<div class="container">
 
-<div class="header">
-  <div class="header-top">
-    <div>
-      <div class="logo">LUFFY<span>'S</span><br>GYM</div>
+  <!-- HERO -->
+  <div class="hero">
+    <span class="hero-label">Updated · Week 3+ · Intermediate Phase</span>
+    <h1>MY <span>GYM</span><br>BLUEPRINT</h1>
+    <p class="hero-sub">2 weeks done — foundation built. Now on an intermediate weight training split for maximum fat loss.</p>
+    <div class="stats-row">
+      <div class="stat-chip">Age <strong>31</strong></div>
+      <div class="stat-chip">Height <strong>5'7"</strong></div>
+      <div class="stat-chip">Start <strong>80 kg</strong></div>
+      <div class="stat-chip">Target <strong>68 kg</strong></div>
+      <div class="stat-chip">Timeline <strong>~22 weeks</strong></div>
     </div>
-    <div class="bmi-badge">TARGET: 53–72 KG</div>
   </div>
-  <div class="tabs" id="tabs">
-    <button class="tab active" onclick="showDay(0)" id="tab-0">MON</button>
-    <button class="tab" onclick="showDay(1)" id="tab-1">TUE</button>
-    <button class="tab rest" id="tab-2">WED ✕</button>
-    <button class="tab" onclick="showDay(3)" id="tab-3">THU</button>
-    <button class="tab" onclick="showDay(4)" id="tab-4">FRI</button>
-    <button class="tab" onclick="showDay(5)" id="tab-5">SAT</button>
-    <button class="tab rest" id="tab-6">SUN ✕</button>
+
+  <!-- PROGRESS TRACKER -->
+  <div class="progress-section">
+    <div class="progress-header">
+      <span class="progress-title">Weekly Progress</span>
+      <span class="progress-count" id="progressCount">0 / 5 sessions done</span>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-sub">
+      <span id="progressMsg">Mark sessions complete as you go 💪</span>
+      <button class="reset-btn" onclick="resetWeek()">RESET WEEK</button>
+    </div>
   </div>
+
+  <!-- GOAL -->
+  <div class="goal-card">
+    <h2>YOUR 6-MONTH MISSION</h2>
+    <div class="goal-numbers">
+      <div class="goal-num"><span class="big green">−12</span><small>KG TO LOSE</small></div>
+      <div class="goal-num"><span class="big cyan">~500</span><small>DAILY CAL DEFICIT</small></div>
+      <div class="goal-num"><span class="big orange">5×</span><small>WORKOUTS/WEEK</small></div>
+    </div>
+    <p>0.7–0.9 kg/week loss rate with this plan. Steady and sustainable.</p>
+  </div>
+
+  <!-- SECTION 1: TRAINING -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <span class="section-title">Training Plan</span>
+    </div>
+
+    <!-- Phase 1 DONE -->
+    <div class="phase-banner" style="opacity:0.45; border-left-color:var(--muted);">
+      <div>
+        <div class="phase-label" style="color:var(--muted)">Phase 1 · ✅ Completed</div>
+        <div class="phase-title" style="color:var(--muted)">Foundation & Cardio Adaptation</div>
+      </div>
+      <div class="phase-duration" style="background:rgba(122,138,126,0.1); color:var(--muted)">Weeks 1–2 · Done</div>
+    </div>
+    <p style="color:var(--muted); font-size:12px; margin-bottom:28px; padding-left:4px;">✓ Treadmill · Cycling · Cross Trainer — base cardio fitness established. Well done.</p>
+
+    <!-- Phase 2 CURRENT -->
+    <div class="phase-banner" style="border-left-color:var(--accent2);">
+      <div>
+        <div class="phase-label" style="color:var(--accent2)">Phase 2 · 🔥 You Are Here</div>
+        <div class="phase-title">Intermediate: Push / Pull / Legs Split</div>
+      </div>
+      <div class="phase-duration" style="background:rgba(71,255,212,0.1); color:var(--accent2)">Weeks 3–12</div>
+    </div>
+
+    <div class="tip-box" style="margin-top:16px;">
+      💡 <strong>Progressive Overload:</strong> Add 2.5kg every time you complete all reps cleanly. Rest 60–90s between sets for compounds, 45–60s for isolation. Tap the ✓ button on each day to track your week.
+    </div>
+
+    <div class="week-grid">
+
+      <!-- MON -->
+      <div class="day-card" id="day-mon">
+        <div class="day-card-top">
+          <span class="day-tag">Monday</span>
+          <button class="check-btn" id="btn-mon" onclick="toggleDay('mon')" title="Mark complete">✓</button>
+        </div>
+        <div class="day-name">Push Day</div>
+        <div class="day-focus">Chest · Shoulders · Triceps</div>
+        <ul class="exercise-list">
+          <li><span>Barbell Bench Press</span> — 4×8–10</li>
+          <li><span>Incline DB Press</span> — 3×10</li>
+          <li><span>Cable Chest Fly</span> — 3×12</li>
+          <li><span>Seated DB Shoulder Press</span> — 3×10</li>
+          <li><span>Lateral Raises</span> — 3×15</li>
+          <li><span>Tricep Rope Pushdown</span> — 3×12</li>
+          <li><span>Overhead DB Tricep Ext.</span> — 3×12</li>
+          <li><span>Treadmill — 20 min, incline 5, speed 5.5</span><span class="cardio-badge">CARDIO</span></li>
+        </ul>
+      </div>
+
+      <!-- TUE -->
+      <div class="day-card" id="day-tue">
+        <div class="day-card-top">
+          <span class="day-tag">Tuesday</span>
+          <button class="check-btn" id="btn-tue" onclick="toggleDay('tue')" title="Mark complete">✓</button>
+        </div>
+        <div class="day-name">Pull Day</div>
+        <div class="day-focus">Back · Biceps · Rear Delts</div>
+        <ul class="exercise-list">
+          <li><span>Barbell Deadlift</span> — 4×6 <em style="color:var(--muted);font-size:10px;">(focus on form)</em></li>
+          <li><span>Lat Pulldown</span> — 4×10</li>
+          <li><span>Seated Cable Row</span> — 3×10</li>
+          <li><span>Single-Arm DB Row</span> — 3×10 each</li>
+          <li><span>Face Pulls</span> — 3×15</li>
+          <li><span>Barbell Curl</span> — 3×12</li>
+          <li><span>Hammer Curl</span> — 3×12</li>
+          <li><span>Cross Trainer — 20 min, resistance 7</span><span class="cardio-badge">CARDIO</span></li>
+        </ul>
+      </div>
+
+      <!-- WED -->
+      <div class="day-card" id="day-wed">
+        <div class="day-card-top">
+          <span class="day-tag">Wednesday</span>
+          <button class="check-btn" id="btn-wed" onclick="toggleDay('wed')" title="Mark complete">✓</button>
+        </div>
+        <div class="day-name">Leg Day</div>
+        <div class="day-focus">Quads · Hamstrings · Glutes · Calves</div>
+        <ul class="exercise-list">
+          <li><span>Barbell Back Squat</span> — 4×8</li>
+          <li><span>Romanian Deadlift (DB)</span> — 3×10</li>
+          <li><span>Leg Press Machine</span> — 3×12</li>
+          <li><span>Leg Curl Machine</span> — 3×12</li>
+          <li><span>Walking Lunges</span> — 3×12 each leg</li>
+          <li><span>Standing Calf Raises</span> — 4×15</li>
+          <li><span>Cycling — 20 min sprint intervals</span><span class="hiit-badge">HIIT</span></li>
+        </ul>
+      </div>
+
+      <!-- THU REST -->
+      <div class="day-card rest" id="day-thu">
+        <div class="day-card-top">
+          <span class="day-tag">Thursday</span>
+          <button class="check-btn" id="btn-thu" onclick="toggleDay('thu')" title="Mark complete">✓</button>
+        </div>
+        <div class="day-name">Active Rest + Core</div>
+        <div class="day-focus">Recovery Day</div>
+        <ul class="exercise-list">
+          <li><span>Plank</span> — 3×45s</li>
+          <li><span>Dead Bug</span> — 3×10 each side</li>
+          <li><span>Russian Twists</span> — 3×20</li>
+          <li><span>30 min brisk walk</span> outdoors</li>
+          <li><span>Full body stretch</span> — 10 min</li>
+        </ul>
+      </div>
+
+      <!-- FRI -->
+      <div class="day-card" id="day-fri">
+        <div class="day-card-top">
+          <span class="day-tag">Friday</span>
+          <button class="check-btn" id="btn-fri" onclick="toggleDay('fri')" title="Mark complete">✓</button>
+        </div>
+        <div class="day-name">Upper Hypertrophy</div>
+        <div class="day-focus">Chest + Back Supersets</div>
+        <ul class="exercise-list">
+          <li><span>SS: DB Press + DB Row</span> — 4×10 each</li>
+          <li><span>SS: Cable Fly + Lat Pulldown</span> — 3×12 each</li>
+          <li><span>SS: Shoulder Press + Face Pulls</span> — 3×12 each</li>
+          <li><span>SS: Bicep Curl + Tricep Pushdown</span> — 3×12 each</li>
+          <li><span>Treadmill — 20 min, incline 6, speed 5</span><span class="cardio-badge">CARDIO</span></li>
+        </ul>
+      </div>
+
+      <!-- SAT -->
+      <div class="day-card" id="day-sat">
+        <div class="day-card-top">
+          <span class="day-tag">Saturday</span>
+          <button class="check-btn" id="btn-sat" onclick="toggleDay('sat')" title="Mark complete">✓</button>
+        </div>
+        <div class="day-name">HIIT + Core Finisher</div>
+        <div class="day-focus">Max Calorie Burn Day</div>
+        <ul class="exercise-list">
+          <li><span>Cycling HIIT</span> — 30s sprint / 90s easy × 10</li>
+          <li><span>Cross Trainer</span> — 15 min steady</li>
+          <li><span>Cable Crunch</span> — 3×15</li>
+          <li><span>Hanging Knee Raise</span> — 3×12</li>
+          <li><span>Plank to Push-up</span> — 3×10</li>
+          <li><span>Mountain Climbers</span> — 3×20</li>
+        </ul>
+      </div>
+
+      <!-- SUN REST -->
+      <div class="day-card rest" id="day-sun">
+        <div class="day-card-top">
+          <span class="day-tag">Sunday</span>
+          <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:18px;">😴</div>
+        </div>
+        <div class="day-name">Full Rest</div>
+        <div class="day-focus">Mandatory Recovery</div>
+        <ul class="exercise-list">
+          <li><span>Complete rest</span></li>
+          <li><span>Prioritize 8h sleep</span></li>
+          <li><span>Eat well, stay hydrated</span></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="calorie-box">
+      <div>
+        <div class="calorie-label">EST. WEEKLY CALORIE BURN</div>
+        <div class="calorie-big">2,200 – 2,800</div>
+        <div style="font-size:11px; color:var(--muted);">kcal from 5 workout sessions</div>
+      </div>
+      <div style="flex:1; min-width:180px;">
+        <div style="font-size:12px; color:var(--muted); line-height:1.8;">
+          Combined with your ~500 kcal/day dietary deficit, total weekly deficit is <strong style="color:var(--text)">~5,700–6,300 kcal</strong> → <strong style="color:var(--text)">0.7–0.9 kg/week</strong> loss.
+        </div>
+      </div>
+    </div>
+
+    <div class="warning">DOMS after leg day and push day is normal. Do NOT skip Thursday recovery — it's placed there intentionally between your hardest days.</div>
+
+    <!-- Phase 3 -->
+    <div class="phase-banner" style="margin-top:24px; border-left-color:var(--accent3);">
+      <div>
+        <div class="phase-label" style="color:var(--accent3)">Phase 3 · Upcoming</div>
+        <div class="phase-title">Cut & Define</div>
+      </div>
+      <div class="phase-duration" style="background:rgba(255,107,53,0.1); color:var(--accent3)">Weeks 13–24</div>
+    </div>
+    <p style="color:var(--muted); font-size:13px; margin-top:4px;">Supersets throughout, rest drops to 45s, weights heavier, extra HIIT session added. By now you'll look visibly different.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SECTION 2: CARDIO GUIDE -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <span class="section-title">Cardio Machine Guide</span>
+    </div>
+    <div class="info-grid">
+      <div class="info-card">
+        <span class="icon">🏃</span>
+        <h3>Treadmill</h3>
+        <ul>
+          <li>Speed <strong style="color:var(--text)">5.5–6.5</strong> for fat burn zone</li>
+          <li>Incline <strong style="color:var(--text)">4–6</strong> burns more without running fast</li>
+          <li>Speed 3 is too slow — barely any calorie burn</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <span class="icon">🚴</span>
+        <h3>Cycling / Bike</h3>
+        <ul>
+          <li>Set resistance to <strong style="color:var(--text)">medium-high</strong></li>
+          <li>30s sprints → 90s easy × 10 rounds = HIIT</li>
+          <li>Knee-friendly and great for testosterone</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <span class="icon">⚙️</span>
+        <h3>Cross Trainer</h3>
+        <ul>
+          <li>Full-body, zero impact — excellent fat burn</li>
+          <li>Keep <strong style="color:var(--text)">RPM above 60</strong></li>
+          <li>Use arm handles actively, don't lean on them</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SECTION 3: NUTRITION -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <span class="section-title">Nutrition Plan</span>
+    </div>
+    <div class="watch-box">
+      <h3>Daily Calorie & Macro Targets</h3>
+      <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Maintenance ~2,400 kcal/day. Eat ~1,900 kcal to lose weight steadily.</p>
+      <table class="nutrition-table">
+        <thead><tr><th>Macro</th><th>Daily Amount</th><th>Why It Matters</th></tr></thead>
+        <tbody>
+          <tr><td>Protein</td><td><span class="macro-highlight">140–160g</span></td><td style="color:var(--muted);font-size:11px;">Preserves muscle, boosts metabolism, keeps you full</td></tr>
+          <tr><td>Carbs</td><td><span class="macro-highlight">160–180g</span></td><td style="color:var(--muted);font-size:11px;">Fuel for workouts. Rice, oats, vegetables</td></tr>
+          <tr><td>Fats</td><td><span class="macro-highlight">50–60g</span></td><td style="color:var(--muted);font-size:11px;">Critical for testosterone. Don't cut fat too low</td></tr>
+          <tr><td>Water</td><td><span class="macro-highlight">3–4 litres</span></td><td style="color:var(--muted);font-size:11px;">Bangladesh heat = you sweat more. Stay hydrated</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="info-grid">
+      <div class="info-card">
+        <span class="icon">🍳</span>
+        <h3>Best Protein Sources</h3>
+        <ul>
+          <li>Eggs (5–6 daily)</li>
+          <li>Hilsa, Rohu, Catla fish</li>
+          <li>Chicken breast</li>
+          <li>Daal + rice combo</li>
+          <li>Greek yogurt / doi</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <span class="icon">🚫</span>
+        <h3>Avoid / Minimize</h3>
+        <ul>
+          <li>Sweetened drinks (cola, juice)</li>
+          <li>White bread & fried snacks</li>
+          <li>Mishti / sweets daily</li>
+          <li>Excess rice at dinner</li>
+          <li>Late-night eating</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <span class="icon">⚡</span>
+        <h3>Pre / Post Workout</h3>
+        <ul>
+          <li>Pre: banana + black coffee, 30 min before</li>
+          <li>Post: eggs + rice within 1 hour</li>
+          <li>Don't train fasted if feeling weak</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SECTION 4: TESTOSTERONE -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <span class="section-title">Boosting Testosterone Naturally</span>
+    </div>
+    <div class="info-grid">
+      <div class="info-card">
+        <span class="icon">🏋️</span>
+        <h3>Train Heavy</h3>
+        <p>Squats, deadlifts, bench press trigger the largest testosterone response. Heavy compound lifts beat cardio for hormone health.</p>
+      </div>
+      <div class="info-card">
+        <span class="icon">😴</span>
+        <h3>Sleep 7–8 Hours</h3>
+        <p>70% of testosterone is produced during sleep. Even 1 week of 5–6h sleep drops T levels by 15%. Non-negotiable.</p>
+      </div>
+      <div class="info-card">
+        <span class="icon">🥚</span>
+        <h3>Eat Healthy Fats</h3>
+        <p>Testosterone is synthesized from cholesterol. Eggs, fish, nuts, and olive oil are essential. Never go very low-fat.</p>
+      </div>
+      <div class="info-card">
+        <span class="icon">☀️</span>
+        <h3>Morning Sunlight</h3>
+        <p>20–30 min of morning sun daily. Vitamin D deficiency is directly linked to low testosterone. Free and powerful.</p>
+      </div>
+      <div class="info-card">
+        <span class="icon">🧘</span>
+        <h3>Manage Stress</h3>
+        <p>Cortisol directly suppresses testosterone. Rest days aren't optional — they're when your hormones recover and grow.</p>
+      </div>
+      <div class="info-card">
+        <span class="icon">🥦</span>
+        <h3>Zinc & Magnesium</h3>
+        <p>Pumpkin seeds, red meat, spinach, almonds. These are directly involved in testosterone synthesis — deficiency is common in active men.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SECTION 5: APPLE WATCH -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <span class="section-title">Apple Watch: Tracking Workouts</span>
+    </div>
+    <div class="watch-box">
+      <h3>How to Track Every Session</h3>
+      <div class="watch-steps">
+        <div class="watch-step">
+          <div class="step-num">1</div>
+          <div class="watch-step-content">
+            <strong>Open the Workout app</strong>
+            <p>Press Digital Crown → find green "Workout" icon. No phone needed.</p>
+          </div>
+        </div>
+        <div class="watch-step">
+          <div class="step-num">2</div>
+          <div class="watch-step-content">
+            <strong>For Cardio Machines</strong>
+            <p>Treadmill → "Indoor Walk/Run" · Cycling → "Indoor Cycle" · Cross Trainer → "Elliptical"</p>
+          </div>
+        </div>
+        <div class="watch-step">
+          <div class="step-num">3</div>
+          <div class="watch-step-content">
+            <strong>For Weight Training</strong>
+            <p>Select "Strength Training" — tracks heart rate, active calories, and time accurately.</p>
+          </div>
+        </div>
+        <div class="watch-step">
+          <div class="step-num">4</div>
+          <div class="watch-step-content">
+            <strong>Can't find it? Add it</strong>
+            <p>Scroll to bottom of Workout app → "Add Workout" → pin your most-used ones to the top.</p>
+          </div>
+        </div>
+        <div class="watch-step">
+          <div class="step-num">5</div>
+          <div class="watch-step-content">
+            <strong>Best companion app: Strong</strong>
+            <p>Download <strong>Strong</strong> (free, iOS) to log sets, reps, and weight. Pairs with Apple Health automatically.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card">
+        <span class="icon">📱</span>
+        <h3>Recommended Apps</h3>
+        <ul>
+          <li><strong style="color:var(--text)">Strong</strong> — log weights & reps</li>
+          <li><strong style="color:var(--text)">MyFitnessPal</strong> — calorie tracking</li>
+          <li><strong style="color:var(--text)">Apple Health</strong> — see all data</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <span class="icon">🎯</span>
+        <h3>Key Metrics to Watch</h3>
+        <ul>
+          <li>Active Calories: target <strong style="color:var(--text)">400–600/session</strong></li>
+          <li>Heart Rate: <strong style="color:var(--text)">130–150 BPM</strong> fat burn zone</li>
+          <li>Resting HR: should drop over weeks</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SECTION 6: TIMELINE -->
+  <section>
+    <div class="section-header">
+      <span class="section-number">06</span>
+      <span class="section-title">What to Expect & When</span>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item done">
+        <div class="timeline-week">WEEK 1–2 · ✅ COMPLETED</div>
+        <div class="timeline-title">Foundation: Cardio & Adaptation</div>
+        <div class="timeline-desc">Treadmill, cycling, cross trainer — base cardio built. Body adapted. Well done.</div>
+      </div>
+      <div class="timeline-item current">
+        <div class="timeline-week" style="color:var(--accent2);">WEEK 3–6 · 📍 YOU ARE HERE</div>
+        <div class="timeline-title">Weight Training Begins</div>
+        <div class="timeline-desc">Expect DOMS after leg and push days. Energy rises noticeably. 1.5–2.5 kg lost. Clothes feeling looser by week 6.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-week">WEEK 6–8</div>
+        <div class="timeline-title">Visible Strength Gains</div>
+        <div class="timeline-desc">Lifting significantly heavier. 3–4 kg lost. Waist noticeably smaller. Cardio becomes easy — increase intensity.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-week">WEEK 12</div>
+        <div class="timeline-title">Major Transformation</div>
+        <div class="timeline-desc">~5–6 kg lost. Muscle definition visible. Energy high. Sex drive clearly improved. People will start noticing.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-week">WEEK 24</div>
+        <div class="timeline-title">Goal Reached: 68 kg</div>
+        <div class="timeline-desc">Target weight achieved. Significant muscle gain. Endurance transformed. A sustainable habit for life.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-text">CONSISTENCY > PERFECTION · SHOW UP EVEN ON BAD DAYS · THE RESULTS FOLLOW</div>
+
 </div>
 
-<div class="content">
-
-  <!-- MONDAY: Full Routine -->
-  <div id="day-0">
-    <div class="day-header">
-      <div class="day-title">MONDAY</div>
-      <div class="day-subtitle">Full Body — Warm-Up + Lower Body + Core + Cardio</div>
-      <div class="day-meta">
-        <div class="meta-pill highlight">~60–70 min</div>
-        <div class="meta-pill">Full Routine</div>
-      </div>
-    </div>
-
-    <div class="progress-label">
-      <span>Progress</span><span id="prog-0-label">0 / 18 done</span>
-    </div>
-    <div class="progress-wrap"><div class="progress-bar" id="prog-0" style="width:0%"></div></div>
-
-    <div class="section">
-      <div class="section-label warmup">🔵 Warm-Up · 5–7 min</div>
-      <div class="exercise-card" id="e0-0" onclick="toggle('e0-0','prog-0','prog-0-label',18)">
-        <div class="ex-num">01</div>
-        <div class="ex-body">
-          <div class="ex-name">Arm Crossover</div>
-          <div class="ex-tip">Stand tall, swing arms across chest. Loosen shoulders.</div>
-        </div>
-        <div class="ex-reps blue">20×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-1" onclick="toggle('e0-1','prog-0','prog-0-label',18)">
-        <div class="ex-num">02</div>
-        <div class="ex-body">
-          <div class="ex-name">Arm Circles</div>
-          <div class="ex-tip">10 forward + 10 backward per set.</div>
-        </div>
-        <div class="ex-reps blue">20×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-2" onclick="toggle('e0-2','prog-0','prog-0-label',18)">
-        <div class="ex-num">03</div>
-        <div class="ex-body">
-          <div class="ex-name">Shoulder Circles</div>
-          <div class="ex-tip">Roll shoulders slowly, big circles. Front then back.</div>
-        </div>
-        <div class="ex-reps blue">20×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-3" onclick="toggle('e0-3','prog-0','prog-0-label',18)">
-        <div class="ex-num">04</div>
-        <div class="ex-body">
-          <div class="ex-name">Shoulder Shrugs</div>
-          <div class="ex-tip">Lift shoulders to ears, hold 1 sec, release.</div>
-        </div>
-        <div class="ex-reps blue">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label lower">🟠 Lower Body · Rest 45–60 sec</div>
-      <div class="exercise-card" id="e0-4" onclick="toggle('e0-4','prog-0','prog-0-label',18)">
-        <div class="ex-num">05</div>
-        <div class="ex-body">
-          <div class="ex-name">Body Extension</div>
-          <div class="ex-tip">Stand, arms up, extend back slowly. Core tight.</div>
-        </div>
-        <div class="ex-reps orange">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-5" onclick="toggle('e0-5','prog-0','prog-0-label',18)">
-        <div class="ex-num">06</div>
-        <div class="ex-body">
-          <div class="ex-name">Lunges</div>
-          <div class="ex-tip">10 each leg. Keep front knee behind toe.</div>
-        </div>
-        <div class="ex-reps orange">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-6" onclick="toggle('e0-6','prog-0','prog-0-label',18)">
-        <div class="ex-num">07</div>
-        <div class="ex-body">
-          <div class="ex-name">Walking Lunges</div>
-          <div class="ex-tip">Move forward with each lunge. Stay controlled.</div>
-        </div>
-        <div class="ex-reps orange">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-7" onclick="toggle('e0-7','prog-0','prog-0-label',18)">
-        <div class="ex-num">08</div>
-        <div class="ex-body">
-          <div class="ex-name">Free Squats</div>
-          <div class="ex-tip">Feet shoulder-width. Sit back, chest up, knees out.</div>
-        </div>
-        <div class="ex-reps orange">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label core">🟡 Core · Rest 30–45 sec</div>
-      <div class="exercise-card" id="e0-8" onclick="toggle('e0-8','prog-0','prog-0-label',18)">
-        <div class="ex-num">09</div>
-        <div class="ex-body">
-          <div class="ex-name">Side Bend</div>
-          <div class="ex-tip">Slow controlled bend each side. Feel the stretch.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-9" onclick="toggle('e0-9','prog-0','prog-0-label',18)">
-        <div class="ex-num">10</div>
-        <div class="ex-body">
-          <div class="ex-name">Twisting</div>
-          <div class="ex-tip">Arms out, twist torso left & right. No jerking.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-10" onclick="toggle('e0-10','prog-0','prog-0-label',18)">
-        <div class="ex-num">11</div>
-        <div class="ex-body">
-          <div class="ex-name">Twisting with Machine</div>
-          <div class="ex-tip">Light resistance. 2 min each side = 4 min total.</div>
-        </div>
-        <div class="ex-reps yellow">4 MIN</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-11" onclick="toggle('e0-11','prog-0','prog-0-label',18)">
-        <div class="ex-num">12</div>
-        <div class="ex-body">
-          <div class="ex-name">Hanging Leg Raises</div>
-          <div class="ex-tip">Hang from bar. Raise legs to 90°, slow and controlled.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-12" onclick="toggle('e0-12','prog-0','prog-0-label',18)">
-        <div class="ex-num">13</div>
-        <div class="ex-body">
-          <div class="ex-name">Seated V-Ups</div>
-          <div class="ex-tip">Sit on bench edge. Lean back, lift knees to chest.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-13" onclick="toggle('e0-13','prog-0','prog-0-label',18)">
-        <div class="ex-num">14</div>
-        <div class="ex-body">
-          <div class="ex-name">60° Crunches</div>
-          <div class="ex-tip">Incline bench. Slow up, squeeze abs, slow down.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-14" onclick="toggle('e0-14','prog-0','prog-0-label',18)">
-        <div class="ex-num">15</div>
-        <div class="ex-body">
-          <div class="ex-name">Abdominal Machine</div>
-          <div class="ex-tip">Light weight, focus on feeling abs contract fully.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e0-15" onclick="toggle('e0-15','prog-0','prog-0-label',18)">
-        <div class="ex-num">16</div>
-        <div class="ex-body">
-          <div class="ex-name">Plank (1+1+1)</div>
-          <div class="ex-tip">3 sets × 1 min. Hips level. Breathe steadily.</div>
-        </div>
-        <div class="ex-reps yellow">3 MIN</div>
-        <button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label cardio">🟣 Cardio Finisher · 20 min</div>
-
-      <div class="treadmill-card" id="e0-16" onclick="toggle('e0-16','prog-0','prog-0-label',18)">
-        <div class="treadmill-title">🏃 Treadmill · 10 min</div>
-        <div class="treadmill-grid">
-          <div class="t-cell">
-            <div class="t-label">Speed</div>
-            <div class="t-value">5–6 <span>km/h</span></div>
-          </div>
-          <div class="t-cell">
-            <div class="t-label">Incline</div>
-            <div class="t-value">2–3 <span>%</span></div>
-          </div>
-          <div class="t-cell">
-            <div class="t-label">Feel</div>
-            <div class="t-value" style="font-size:15px;font-family:'DM Sans'">Brisk Walk</div>
-          </div>
-          <div class="t-cell">
-            <div class="t-label">Goal</div>
-            <div class="t-value" style="font-size:15px;font-family:'DM Sans'">Fat Burn</div>
-          </div>
-        </div>
-        <div class="t-note">💡 Beginner tip: Start at 5 km/h, incline 2%. After 2 weeks bump to 5.5 km/h, incline 3%. The incline simulates outdoor walking and burns more calories than flat.</div>
-      </div>
-
-      <div class="cardio-row" id="e0-17" onclick="toggle('e0-17','prog-0','prog-0-label',18)" style="cursor:pointer">
-        <div>
-          <div class="cardio-name">🚴 Cycling</div>
-          <div class="ex-tip" style="margin-top:4px">Medium resistance. Steady pace.</div>
-        </div>
-        <div class="cardio-time">5 MIN</div>
-      </div>
-
-      <div class="cardio-row" onclick="toggle('e0-17b','prog-0','prog-0-label',18)" id="e0-17b" style="cursor:pointer">
-        <div>
-          <div class="cardio-name">⚡ Cross Trainer</div>
-          <div class="ex-tip" style="margin-top:4px">Arms + legs. Full body finish.</div>
-        </div>
-        <div class="cardio-time">5 MIN</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TUESDAY: Core Focus -->
-  <div id="day-1" class="hidden">
-    <div class="day-header">
-      <div class="day-title">TUESDAY</div>
-      <div class="day-subtitle">Core Focus + Light Cardio</div>
-      <div class="day-meta">
-        <div class="meta-pill highlight">~40–50 min</div>
-        <div class="meta-pill">Core Day</div>
-      </div>
-    </div>
-
-    <div class="progress-label">
-      <span>Progress</span><span id="prog-1-label">0 / 12 done</span>
-    </div>
-    <div class="progress-wrap"><div class="progress-bar" id="prog-1" style="width:0%"></div></div>
-
-    <div class="section">
-      <div class="section-label warmup">🔵 Warm-Up · 5 min</div>
-      <div class="exercise-card" id="e1-0" onclick="toggle('e1-0','prog-1','prog-1-label',12)">
-        <div class="ex-num">01</div>
-        <div class="ex-body">
-          <div class="ex-name">Arm Crossover</div>
-          <div class="ex-tip">Loosen up the upper body. Easy pace.</div>
-        </div>
-        <div class="ex-reps blue">20×2</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e1-1" onclick="toggle('e1-1','prog-1','prog-1-label',12)">
-        <div class="ex-num">02</div>
-        <div class="ex-body">
-          <div class="ex-name">Shoulder Shrugs</div>
-          <div class="ex-tip">Roll into it. Warm the traps and neck.</div>
-        </div>
-        <div class="ex-reps blue">10×2</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e1-2" onclick="toggle('e1-2','prog-1','prog-1-label',12)">
-        <div class="ex-num">03</div>
-        <div class="ex-body">
-          <div class="ex-name">Twisting (Bodyweight)</div>
-          <div class="ex-tip">Loosen the spine. Arms out wide.</div>
-        </div>
-        <div class="ex-reps blue">10×2</div>
-        <button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label core">🟡 Core Block · Rest 30 sec</div>
-      <div class="exercise-card" id="e1-3" onclick="toggle('e1-3','prog-1','prog-1-label',12)">
-        <div class="ex-num">04</div>
-        <div class="ex-body">
-          <div class="ex-name">Side Bend</div>
-          <div class="ex-tip">Slow, deep bend. Both sides = 1 rep.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e1-4" onclick="toggle('e1-4','prog-1','prog-1-label',12)">
-        <div class="ex-num">05</div>
-        <div class="ex-body">
-          <div class="ex-name">Hanging Leg Raises</div>
-          <div class="ex-tip">Control the lower! Don't swing.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e1-5" onclick="toggle('e1-5','prog-1','prog-1-label',12)">
-        <div class="ex-num">06</div>
-        <div class="ex-body">
-          <div class="ex-name">Seated V-Ups</div>
-          <div class="ex-tip">Engage the lower abs. Slow release.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e1-6" onclick="toggle('e1-6','prog-1','prog-1-label',12)">
-        <div class="ex-num">07</div>
-        <div class="ex-body">
-          <div class="ex-name">60° Crunches</div>
-          <div class="ex-tip">Focus: slow and squeeze at the top.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e1-7" onclick="toggle('e1-7','prog-1','prog-1-label',12)">
-        <div class="ex-num">08</div>
-        <div class="ex-body">
-          <div class="ex-name">Abdominal Machine</div>
-          <div class="ex-tip">Light-medium resistance. Full squeeze.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e1-8" onclick="toggle('e1-8','prog-1','prog-1-label',12)">
-        <div class="ex-num">09</div>
-        <div class="ex-body">
-          <div class="ex-name">Twisting Machine</div>
-          <div class="ex-tip">2 min left + 2 min right. Light weight.</div>
-        </div>
-        <div class="ex-reps yellow">4 MIN</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e1-9" onclick="toggle('e1-9','prog-1','prog-1-label',12)">
-        <div class="ex-num">10</div>
-        <div class="ex-body">
-          <div class="ex-name">Plank</div>
-          <div class="ex-tip">3 × 1 min holds. Hips flat, breathe.</div>
-        </div>
-        <div class="ex-reps yellow">3 MIN</div>
-        <button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label cardio">🟣 Cardio · 20 min</div>
-      <div class="treadmill-card" id="e1-10" onclick="toggle('e1-10','prog-1','prog-1-label',12)">
-        <div class="treadmill-title">🏃 Treadmill · 10 min</div>
-        <div class="treadmill-grid">
-          <div class="t-cell">
-            <div class="t-label">Speed</div>
-            <div class="t-value">5 <span>km/h</span></div>
-          </div>
-          <div class="t-cell">
-            <div class="t-label">Incline</div>
-            <div class="t-value">2 <span>%</span></div>
-          </div>
-          <div class="t-cell">
-            <div class="t-label">Feel</div>
-            <div class="t-value" style="font-size:15px;font-family:'DM Sans'">Comfortable</div>
-          </div>
-          <div class="t-cell">
-            <div class="t-label">Goal</div>
-            <div class="t-value" style="font-size:15px;font-family:'DM Sans'">Recovery</div>
-          </div>
-        </div>
-        <div class="t-note">💡 Tuesday is a lighter cardio day. Keep it easy — you trained yesterday. Focus on breathing and form.</div>
-      </div>
-      <div class="cardio-row" id="e1-11" onclick="toggle('e1-11','prog-1','prog-1-label',12)" style="cursor:pointer">
-        <div>
-          <div class="cardio-name">🚴 Cycling</div>
-          <div class="ex-tip" style="margin-top:4px">Easy resistance. Cool down pace.</div>
-        </div>
-        <div class="cardio-time">10 MIN</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- WEDNESDAY: REST -->
-  <div id="day-2" class="hidden">
-    <div class="rest-day">
-      <div class="rest-icon">😴</div>
-      <div class="rest-title">REST DAY</div>
-      <div class="rest-text">Wednesday is your recovery day.<br>Sleep well. Eat well. Stay hydrated.<br><br>Your muscles grow during rest, not during the workout.</div>
-    </div>
-  </div>
-
-  <!-- THURSDAY: Lower Body Focus -->
-  <div id="day-3" class="hidden">
-    <div class="day-header">
-      <div class="day-title">THURSDAY</div>
-      <div class="day-subtitle">Lower Body Focus + Core + Cardio</div>
-      <div class="day-meta">
-        <div class="meta-pill highlight">~50–60 min</div>
-        <div class="meta-pill">Legs + Core</div>
-      </div>
-    </div>
-
-    <div class="progress-label">
-      <span>Progress</span><span id="prog-3-label">0 / 14 done</span>
-    </div>
-    <div class="progress-wrap"><div class="progress-bar" id="prog-3" style="width:0%"></div></div>
-
-    <div class="section">
-      <div class="section-label warmup">🔵 Warm-Up · 5 min</div>
-      <div class="exercise-card" id="e3-0" onclick="toggle('e3-0','prog-3','prog-3-label',14)">
-        <div class="ex-num">01</div>
-        <div class="ex-body">
-          <div class="ex-name">Arm Crossover</div>
-          <div class="ex-tip">Wake up the body. Steady breathing.</div>
-        </div>
-        <div class="ex-reps blue">20×2</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e3-1" onclick="toggle('e3-1','prog-3','prog-3-label',14)">
-        <div class="ex-num">02</div>
-        <div class="ex-body">
-          <div class="ex-name">Arm Circles + Shoulder Circles</div>
-          <div class="ex-tip">Combine into one warm-up. 10 each.</div>
-        </div>
-        <div class="ex-reps blue">10×2</div>
-        <button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label lower">🟠 Lower Body · Push Harder Today</div>
-      <div class="exercise-card" id="e3-2" onclick="toggle('e3-2','prog-3','prog-3-label',14)">
-        <div class="ex-num">03</div>
-        <div class="ex-body">
-          <div class="ex-name">Free Squats</div>
-          <div class="ex-tip">Go deeper than Monday. Slow on the way down.</div>
-        </div>
-        <div class="ex-reps orange">12×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e3-3" onclick="toggle('e3-3','prog-3','prog-3-label',14)">
-        <div class="ex-num">04</div>
-        <div class="ex-body">
-          <div class="ex-name">Lunges</div>
-          <div class="ex-tip">12 each leg. Focus on balance and depth.</div>
-        </div>
-        <div class="ex-reps orange">12×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e3-4" onclick="toggle('e3-4','prog-3','prog-3-label',14)">
-        <div class="ex-num">05</div>
-        <div class="ex-body">
-          <div class="ex-name">Walking Lunges</div>
-          <div class="ex-tip">Controlled stride. Big steps.</div>
-        </div>
-        <div class="ex-reps orange">12×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e3-5" onclick="toggle('e3-5','prog-3','prog-3-label',14)">
-        <div class="ex-num">06</div>
-        <div class="ex-body">
-          <div class="ex-name">Side Bend</div>
-          <div class="ex-tip">Stretch the obliques fully each side.</div>
-        </div>
-        <div class="ex-reps orange">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e3-6" onclick="toggle('e3-6','prog-3','prog-3-label',14)">
-        <div class="ex-num">07</div>
-        <div class="ex-body">
-          <div class="ex-name">Body Extension</div>
-          <div class="ex-tip">Stretch up and slightly back. Core engaged.</div>
-        </div>
-        <div class="ex-reps orange">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label core">🟡 Core · Best Effort</div>
-      <div class="exercise-card" id="e3-7" onclick="toggle('e3-7','prog-3','prog-3-label',14)">
-        <div class="ex-num">08</div>
-        <div class="ex-body">
-          <div class="ex-name">Hanging Leg Raises</div>
-          <div class="ex-tip">No swinging. Controlled raise and lower.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e3-8" onclick="toggle('e3-8','prog-3','prog-3-label',14)">
-        <div class="ex-num">09</div>
-        <div class="ex-body">
-          <div class="ex-name">60° Crunches</div>
-          <div class="ex-tip">Squeeze top. Slow negative. Quality &gt; speed.</div>
-        </div>
-        <div class="ex-reps yellow">10×3</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e3-9" onclick="toggle('e3-9','prog-3','prog-3-label',14)">
-        <div class="ex-num">10</div>
-        <div class="ex-body">
-          <div class="ex-name">Twisting Machine</div>
-          <div class="ex-tip">Light-medium weight. 2+2 mins.</div>
-        </div>
-        <div class="ex-reps yellow">4 MIN</div>
-        <button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e3-10" onclick="toggle('e3-10','prog-3','prog-3-label',14)">
-        <div class="ex-num">11</div>
-        <div class="ex-body">
-          <div class="ex-name">Plank</div>
-          <div class="ex-tip">3 × 1 min. Try to improve vs Monday.</div>
-        </div>
-        <div class="ex-reps yellow">3 MIN</div>
-        <button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label cardio">🟣 Cardio · 20 min</div>
-      <div class="treadmill-card" id="e3-11" onclick="toggle('e3-11','prog-3','prog-3-label',14)">
-        <div class="treadmill-title">🏃 Treadmill · 10 min</div>
-        <div class="treadmill-grid">
-          <div class="t-cell">
-            <div class="t-label">Speed</div>
-            <div class="t-value">5.5 <span>km/h</span></div>
-          </div>
-          <div class="t-cell">
-            <div class="t-label">Incline</div>
-            <div class="t-value">3 <span>%</span></div>
-          </div>
-          <div class="t-cell">
-            <div class="t-label">Feel</div>
-            <div class="t-value" style="font-size:15px;font-family:'DM Sans'">Push a bit</div>
-          </div>
-          <div class="t-cell">
-            <div class="t-label">Goal</div>
-            <div class="t-value" style="font-size:15px;font-family:'DM Sans'">Fat Burn</div>
-          </div>
-        </div>
-        <div class="t-note">💡 Thursday push: slightly faster than Monday. Incline 3% activates glutes more — great after leg day.</div>
-      </div>
-      <div class="cardio-row" id="e3-12" onclick="toggle('e3-12','prog-3','prog-3-label',14)" style="cursor:pointer">
-        <div>
-          <div class="cardio-name">🚴 Cycling</div>
-          <div class="ex-tip" style="margin-top:4px">Medium resistance. Keep legs moving.</div>
-        </div>
-        <div class="cardio-time">5 MIN</div>
-      </div>
-      <div class="cardio-row" id="e3-13" onclick="toggle('e3-13','prog-3','prog-3-label',14)" style="cursor:pointer">
-        <div>
-          <div class="cardio-name">⚡ Cross Trainer</div>
-          <div class="ex-tip" style="margin-top:4px">Full body finisher. Push the arms.</div>
-        </div>
-        <div class="cardio-time">5 MIN</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FRIDAY: Full Routine (same as Monday) -->
-  <div id="day-4" class="hidden">
-    <div class="day-header">
-      <div class="day-title">FRIDAY</div>
-      <div class="day-subtitle">Full Body — Complete Routine</div>
-      <div class="day-meta">
-        <div class="meta-pill highlight">~60–70 min</div>
-        <div class="meta-pill">Full Routine</div>
-        <div class="meta-pill" style="border-color:var(--accent2);color:var(--accent2)">End of Week Push</div>
-      </div>
-    </div>
-
-    <div class="progress-label">
-      <span>Progress</span><span id="prog-4-label">0 / 18 done</span>
-    </div>
-    <div class="progress-wrap"><div class="progress-bar" id="prog-4" style="width:0%"></div></div>
-
-    <div class="section">
-      <div class="section-label warmup">🔵 Warm-Up · 5–7 min</div>
-      <div class="exercise-card" id="e4-0" onclick="toggle('e4-0','prog-4','prog-4-label',18)">
-        <div class="ex-num">01</div><div class="ex-body"><div class="ex-name">Arm Crossover</div><div class="ex-tip">Full ROM. Loosen everything up.</div></div>
-        <div class="ex-reps blue">20×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-1" onclick="toggle('e4-1','prog-4','prog-4-label',18)">
-        <div class="ex-num">02</div><div class="ex-body"><div class="ex-name">Arm Circles</div><div class="ex-tip">10 fwd + 10 back each set.</div></div>
-        <div class="ex-reps blue">20×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-2" onclick="toggle('e4-2','prog-4','prog-4-label',18)">
-        <div class="ex-num">03</div><div class="ex-body"><div class="ex-name">Shoulder Circles</div><div class="ex-tip">Big rolls. Warm up the rotator cuff.</div></div>
-        <div class="ex-reps blue">20×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-3" onclick="toggle('e4-3','prog-4','prog-4-label',18)">
-        <div class="ex-num">04</div><div class="ex-body"><div class="ex-name">Shoulder Shrugs</div><div class="ex-tip">Slow. Hold at top 1 sec.</div></div>
-        <div class="ex-reps blue">10×3</div><button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label lower">🟠 Lower Body · End-of-Week Push</div>
-      <div class="exercise-card" id="e4-4" onclick="toggle('e4-4','prog-4','prog-4-label',18)">
-        <div class="ex-num">05</div><div class="ex-body"><div class="ex-name">Body Extension</div><div class="ex-tip">Controlled. Feel the full extension.</div></div>
-        <div class="ex-reps orange">10×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-5" onclick="toggle('e4-5','prog-4','prog-4-label',18)">
-        <div class="ex-num">06</div><div class="ex-body"><div class="ex-name">Lunges</div><div class="ex-tip">Try 12 reps today if legs feel strong.</div></div>
-        <div class="ex-reps orange">10×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-6" onclick="toggle('e4-6','prog-4','prog-4-label',18)">
-        <div class="ex-num">07</div><div class="ex-body"><div class="ex-name">Walking Lunges</div><div class="ex-tip">Long strides. Cover distance.</div></div>
-        <div class="ex-reps orange">10×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-7" onclick="toggle('e4-7','prog-4','prog-4-label',18)">
-        <div class="ex-num">08</div><div class="ex-body"><div class="ex-name">Free Squats</div><div class="ex-tip">Deep. Ass to grass if comfortable.</div></div>
-        <div class="ex-reps orange">10×3</div><button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label core">🟡 Core</div>
-      <div class="exercise-card" id="e4-8" onclick="toggle('e4-8','prog-4','prog-4-label',18)">
-        <div class="ex-num">09</div><div class="ex-body"><div class="ex-name">Side Bend</div><div class="ex-tip">Both sides, full stretch.</div></div>
-        <div class="ex-reps yellow">10×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-9" onclick="toggle('e4-9','prog-4','prog-4-label',18)">
-        <div class="ex-num">10</div><div class="ex-body"><div class="ex-name">Twisting</div><div class="ex-tip">Arms out, rotate fully each side.</div></div>
-        <div class="ex-reps yellow">10×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-10" onclick="toggle('e4-10','prog-4','prog-4-label',18)">
-        <div class="ex-num">11</div><div class="ex-body"><div class="ex-name">Twisting Machine</div><div class="ex-tip">2+2 = 4 min total. Light resistance.</div></div>
-        <div class="ex-reps yellow">4 MIN</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-11" onclick="toggle('e4-11','prog-4','prog-4-label',18)">
-        <div class="ex-num">12</div><div class="ex-body"><div class="ex-name">Hanging Leg Raises</div><div class="ex-tip">Controlled. No swinging.</div></div>
-        <div class="ex-reps yellow">10×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-12" onclick="toggle('e4-12','prog-4','prog-4-label',18)">
-        <div class="ex-num">13</div><div class="ex-body"><div class="ex-name">Seated V-Ups</div><div class="ex-tip">Lower ab focus. Slow lower.</div></div>
-        <div class="ex-reps yellow">10×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-13" onclick="toggle('e4-13','prog-4','prog-4-label',18)">
-        <div class="ex-num">14</div><div class="ex-body"><div class="ex-name">60° Crunches</div><div class="ex-tip">Squeeze hard at top. Breathe out.</div></div>
-        <div class="ex-reps yellow">10×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-14" onclick="toggle('e4-14','prog-4','prog-4-label',18)">
-        <div class="ex-num">15</div><div class="ex-body"><div class="ex-name">Abdominal Machine</div><div class="ex-tip">Full contraction. Don't rush.</div></div>
-        <div class="ex-reps yellow">10×3</div><button class="check-btn">○</button>
-      </div>
-      <div class="exercise-card" id="e4-15" onclick="toggle('e4-15','prog-4','prog-4-label',18)">
-        <div class="ex-num">16</div><div class="ex-body"><div class="ex-name">Plank (1+1+1)</div><div class="ex-tip">Last core exercise. Make it count.</div></div>
-        <div class="ex-reps yellow">3 MIN</div><button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label cardio">🟣 Cardio Finisher</div>
-      <div class="treadmill-card" id="e4-16" onclick="toggle('e4-16','prog-4','prog-4-label',18)">
-        <div class="treadmill-title">🏃 Treadmill · 10 min</div>
-        <div class="treadmill-grid">
-          <div class="t-cell"><div class="t-label">Speed</div><div class="t-value">5.5–6 <span>km/h</span></div></div>
-          <div class="t-cell"><div class="t-label">Incline</div><div class="t-value">3 <span>%</span></div></div>
-          <div class="t-cell"><div class="t-label">Feel</div><div class="t-value" style="font-size:15px;font-family:'DM Sans'">Strong finish</div></div>
-          <div class="t-cell"><div class="t-label">Goal</div><div class="t-value" style="font-size:15px;font-family:'DM Sans'">Best effort</div></div>
-        </div>
-        <div class="t-note">💡 End the week strong. Push the pace a little more than Monday. You've earned it!</div>
-      </div>
-      <div class="cardio-row" id="e4-17" onclick="toggle('e4-17','prog-4','prog-4-label',18)" style="cursor:pointer">
-        <div><div class="cardio-name">🚴 Cycling</div><div class="ex-tip" style="margin-top:4px">Medium resistance.</div></div>
-        <div class="cardio-time">5 MIN</div>
-      </div>
-      <div class="cardio-row" id="e4-17b" onclick="toggle('e4-17b','prog-4','prog-4-label',18)" style="cursor:pointer">
-        <div><div class="cardio-name">⚡ Cross Trainer</div><div class="ex-tip" style="margin-top:4px">Full intensity. Weekend starts after this.</div></div>
-        <div class="cardio-time">5 MIN</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SATURDAY: Cardio Only -->
-  <div id="day-5" class="hidden">
-    <div class="day-header">
-      <div class="day-title">SATURDAY</div>
-      <div class="day-subtitle">Active Recovery — Cardio Only</div>
-      <div class="day-meta">
-        <div class="meta-pill highlight">~25–30 min</div>
-        <div class="meta-pill">Light Day</div>
-      </div>
-    </div>
-
-    <div class="sat-note">
-      💜 Saturday is your active recovery day. No heavy lifting — just keep the body moving, burn some calories, and loosen up after a hard week.
-    </div>
-
-    <div class="progress-label">
-      <span>Progress</span><span id="prog-5-label">0 / 4 done</span>
-    </div>
-    <div class="progress-wrap"><div class="progress-bar" id="prog-5" style="width:0%"></div></div>
-
-    <div class="section">
-      <div class="section-label warmup">🔵 Light Warm-Up · 5 min</div>
-      <div class="exercise-card" id="e5-0" onclick="toggle('e5-0','prog-5','prog-5-label',4)">
-        <div class="ex-num">01</div>
-        <div class="ex-body">
-          <div class="ex-name">Arm Crossover + Circles</div>
-          <div class="ex-tip">Easy. Just wake up the joints.</div>
-        </div>
-        <div class="ex-reps blue">2 MIN</div>
-        <button class="check-btn">○</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-label cardio">🟣 Cardio · 25 min</div>
-      <div class="treadmill-card" id="e5-1" onclick="toggle('e5-1','prog-5','prog-5-label',4)">
-        <div class="treadmill-title">🏃 Treadmill · 15 min</div>
-        <div class="treadmill-grid">
-          <div class="t-cell"><div class="t-label">Speed</div><div class="t-value">4.5–5 <span>km/h</span></div></div>
-          <div class="t-cell"><div class="t-label">Incline</div><div class="t-value">1–2 <span>%</span></div></div>
-          <div class="t-cell"><div class="t-label">Feel</div><div class="t-value" style="font-size:15px;font-family:'DM Sans'">Relaxed</div></div>
-          <div class="t-cell"><div class="t-label">Goal</div><div class="t-value" style="font-size:15px;font-family:'DM Sans'">Active Rest</div></div>
-        </div>
-        <div class="t-note">💡 Saturday: Lower speed and incline. Think of this as a leisurely walk. Podcast on, no rush.</div>
-      </div>
-      <div class="cardio-row" id="e5-2" onclick="toggle('e5-2','prog-5','prog-5-label',4)" style="cursor:pointer">
-        <div><div class="cardio-name">🚴 Cycling</div><div class="ex-tip" style="margin-top:4px">Easy resistance. Nice and steady.</div></div>
-        <div class="cardio-time">5 MIN</div>
-      </div>
-      <div class="cardio-row" id="e5-3" onclick="toggle('e5-3','prog-5','prog-5-label',4)" style="cursor:pointer">
-        <div><div class="cardio-name">⚡ Cross Trainer</div><div class="ex-tip" style="margin-top:4px">Light pace. Cool down finish.</div></div>
-        <div class="cardio-time">5 MIN</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SUNDAY: REST -->
-  <div id="day-6" class="hidden">
-    <div class="rest-day">
-      <div class="rest-icon">🌟</div>
-      <div class="rest-title">REST DAY</div>
-      <div class="rest-text">Sunday is full rest.<br>You trained 5 days this week. That's incredible.<br><br>Recover, refuel, and come back stronger on Monday.</div>
-    </div>
-  </div>
-
-</div>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
-  const restDays = [2, 6];
-  let currentDay = 0;
+  const DAYS = ['mon','tue','wed','thu','fri','sat'];
+  const WORKOUT_DAYS = ['mon','tue','wed','fri','sat']; // thu is rest, tracked separately
+  const MESSAGES = [
+    'Session logged! 💪',
+    'Get it! 🔥',
+    'One step closer to 68kg! ✅',
+    'Beast mode activated 🏋️',
+    'That\'s progress! 🎯'
+  ];
 
-  // --- localStorage helpers ---
-  const STORAGE_KEY = 'luffy_gym_v1';
-
-  function getTodayKey() {
-    const d = new Date();
-    return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-  }
-
-  function loadState() {
+  // ── State ──
+  function getState() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : {};
-    } catch(e) { return {}; }
+      return JSON.parse(localStorage.getItem('gymState') || '{}');
+    } catch { return {}; }
   }
 
   function saveState(state) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+    localStorage.setItem('gymState', JSON.stringify(state));
   }
 
-  // State: { "2024-5-20": { "e0-1": true, "e0-2": true, ... }, ... }
-  let state = loadState();
-
-  // Auto-reset: clear previous days older than today so each day starts fresh
-  function pruneOldDays() {
-    const todayKey = getTodayKey();
-    const d = new Date();
-    // Keep only last 7 days
-    const keep = [];
-    for (let i = 0; i < 7; i++) {
-      const dd = new Date(d);
-      dd.setDate(d.getDate() - i);
-      keep.push(`${dd.getFullYear()}-${dd.getMonth()+1}-${dd.getDate()}`);
-    }
-    let changed = false;
-    for (const k of Object.keys(state)) {
-      if (!keep.includes(k)) { delete state[k]; changed = true; }
-    }
-    if (changed) saveState(state);
-  }
-
-  function getDayChecked(dayIdx) {
-    // Use today's date key for current tab day
-    // We store per calendar-date, so re-opening same day restores progress
-    const dateKey = getTodayKey();
-    if (!state[dateKey]) state[dateKey] = {};
-    return state[dateKey];
-  }
-
-  function showDay(idx) {
-    for (let i = 0; i <= 6; i++) {
-      const el = document.getElementById('day-' + i);
-      if (el) el.classList.add('hidden');
-      const tab = document.getElementById('tab-' + i);
-      if (tab && !restDays.includes(i)) tab.classList.remove('active');
-    }
-    document.getElementById('day-' + idx).classList.remove('hidden');
-    document.getElementById('tab-' + idx).classList.add('active');
-    currentDay = idx;
-  }
-
-  function toggle(id, progId, labelId, total) {
-    const card = document.getElementById(id);
-    if (!card) return;
-    const dateKey = getTodayKey();
-    if (!state[dateKey]) state[dateKey] = {};
-
-    const isDone = card.classList.contains('done');
-    if (isDone) {
-      card.classList.remove('done');
-      delete state[dateKey][id];
-    } else {
-      card.classList.add('done');
-      state[dateKey][id] = true;
-    }
+  // ── Toggle a day ──
+  function toggleDay(day) {
+    const state = getState();
+    state[day] = !state[day];
     saveState(state);
-    updateProgress(progId, labelId, total);
+    renderAll(state);
+
+    if (state[day]) {
+      showToast(MESSAGES[Math.floor(Math.random() * MESSAGES.length)]);
+    }
   }
 
-  function updateProgress(progId, labelId, total) {
-    const bar = document.getElementById(progId);
-    const label = document.getElementById(labelId);
-    const dayIdx = progId.split('-')[1];
-    const dateKey = getTodayKey();
-    const dayState = (state[dateKey] || {});
+  // ── Reset week ──
+  function resetWeek() {
+    if (!confirm('Reset this week\'s progress?')) return;
+    saveState({});
+    renderAll({});
+    showToast('Week reset. Let\'s go again! 🔄');
+  }
+
+  // ── Render ──
+  function renderAll(state) {
     let done = 0;
-    for (const key of Object.keys(dayState)) {
-      if (dayState[key] && key.startsWith('e' + dayIdx + '-')) done++;
-    }
-    const pct = Math.min(100, Math.round((done / total) * 100));
-    bar.style.width = pct + '%';
-    bar.style.background = pct === 100 ? '#47ff8a' : 'var(--accent)';
-    label.textContent = done + ' / ' + total + ' done';
-  }
 
-  function restoreAllChecks() {
-    const dateKey = getTodayKey();
-    const dayState = state[dateKey] || {};
-    // Restore all checked cards
-    for (const id of Object.keys(dayState)) {
-      if (dayState[id]) {
-        const card = document.getElementById(id);
-        if (card) card.classList.add('done');
+    DAYS.forEach(day => {
+      const card = document.getElementById('day-' + day);
+      const btn = document.getElementById('btn-' + day);
+      if (!card) return;
+
+      const isChecked = !!state[day];
+
+      if (isChecked) {
+        card.classList.add('completed');
+        if (btn) { btn.classList.add('checked'); btn.textContent = '✓'; }
+        if (WORKOUT_DAYS.includes(day)) done++;
+      } else {
+        card.classList.remove('completed');
+        if (btn) { btn.classList.remove('checked'); btn.textContent = '✓'; }
       }
-    }
-    // Restore all progress bars
-    const configs = [
-      { progId: 'prog-0', labelId: 'prog-0-label', total: 18 },
-      { progId: 'prog-1', labelId: 'prog-1-label', total: 12 },
-      { progId: 'prog-3', labelId: 'prog-3-label', total: 14 },
-      { progId: 'prog-4', labelId: 'prog-4-label', total: 18 },
-      { progId: 'prog-5', labelId: 'prog-5-label', total: 4 },
+    });
+
+    const total = WORKOUT_DAYS.length;
+    const pct = Math.round((done / total) * 100);
+
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressCount').textContent = done + ' / ' + total + ' sessions done';
+
+    const msgs = [
+      'Mark sessions complete as you go 💪',
+      'Good start — keep going!',
+      'Halfway there this week!',
+      'Almost a full week — push through!',
+      'Full week locked in! 🏆 Reset for next week.',
     ];
-    for (const c of configs) updateProgress(c.progId, c.labelId, c.total);
+    document.getElementById('progressMsg').textContent = msgs[Math.min(done, msgs.length - 1)];
   }
 
-  // Init
-  pruneOldDays();
-  const today = new Date().getDay(); // 0=Sun
-  const tabMap = { 0: 6, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5 };
-  const autoDay = tabMap[today];
-  showDay(autoDay);
-  restoreAllChecks();
-
-  // --- PWA Install Banner ---
-  let deferredPrompt = null;
-
-  const installBanner = document.createElement('div');
-  installBanner.id = 'install-banner';
-  installBanner.innerHTML = `
-    <div style="display:flex;align-items:center;gap:12px;flex:1">
-      <span style="font-size:24px">💪</span>
-      <div>
-        <div style="font-weight:700;font-size:14px;color:#0d0d0d">Install as App</div>
-        <div style="font-size:11px;color:#444;margin-top:1px">Works offline · Saves to home screen</div>
-      </div>
-    </div>
-    <button id="install-btn" style="background:#0d0d0d;color:#e8ff47;border:none;border-radius:20px;padding:8px 16px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;flex-shrink:0">Install</button>
-    <button id="dismiss-btn" style="background:transparent;border:none;color:#888;font-size:20px;cursor:pointer;padding:0 4px;flex-shrink:0">✕</button>
-  `;
-  Object.assign(installBanner.style, {
-    position: 'fixed', bottom: '20px', left: '16px', right: '16px',
-    background: '#e8ff47', borderRadius: '16px', padding: '14px 16px',
-    display: 'none', alignItems: 'center', gap: '12px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.5)', zIndex: '999',
-    fontFamily: "'DM Sans',sans-serif"
-  });
-  document.body.appendChild(installBanner);
-
-  // iOS install instructions banner (Safari doesn't support beforeinstallprompt)
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isInStandalone = window.navigator.standalone === true;
-  const dismissed = localStorage.getItem('pwa_dismissed');
-
-  if (isIOS && !isInStandalone && !dismissed) {
-    installBanner.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px;flex:1">
-        <span style="font-size:24px">📱</span>
-        <div>
-          <div style="font-weight:700;font-size:13px;color:#0d0d0d">Add to Home Screen</div>
-          <div style="font-size:11px;color:#444;margin-top:2px">Tap <b>Share</b> → <b>Add to Home Screen</b></div>
-        </div>
-      </div>
-      <button id="dismiss-btn" style="background:transparent;border:none;color:#666;font-size:20px;cursor:pointer;padding:0 4px;flex-shrink:0">✕</button>
-    `;
-    installBanner.style.display = 'flex';
+  // ── Toast ──
+  let toastTimer;
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
   }
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if (!dismissed) installBanner.style.display = 'flex';
-  });
+  // ── Init ──
+  renderAll(getState());
 
-  document.addEventListener('click', (e) => {
-    if (e.target.id === 'install-btn' && deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(() => {
-        deferredPrompt = null;
-        installBanner.style.display = 'none';
-      });
-    }
-    if (e.target.id === 'dismiss-btn') {
-      installBanner.style.display = 'none';
-      localStorage.setItem('pwa_dismissed', '1');
-    }
-  });
-
-  window.addEventListener('appinstalled', () => {
-    installBanner.style.display = 'none';
-  });
-
-  // --- Register Service Worker ---
+  // ── Service Worker ──
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 </script>
 </body>

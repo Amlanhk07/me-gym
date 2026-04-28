@@ -1,12 +1,12 @@
 {
-  "name": "Luffy's Gym Routine",
-  "short_name": "Luffy Gym",
-  "description": "Personal 5-day gym routine tracker",
+  "name": "My Gym Blueprint",
+  "short_name": "Gym Plan",
+  "description": "Personal gym plan and workout tracker",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d0d0d",
-  "theme_color": "#e8ff47",
-  "orientation": "portrait",
+  "background_color": "#0d0f0e",
+  "theme_color": "#0d0f0e",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "icon-192.png",
