@@ -3,1154 +3,706 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0d0f0e">
+<meta name="theme-color" content="#0f0e0b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="My Gym Plan">
+<meta name="apple-mobile-web-app-title" content="My Gym">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>My Gym Plan</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Weekly Gym Split</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0d0f0e;
-    --surface: #151918;
-    --card: #1b1f1e;
-    --card-hover: #202524;
-    --border: #2a302e;
-    --accent: #b5ff47;
-    --accent2: #47ffd4;
-    --accent3: #ff6b35;
-    --text: #e8ede9;
-    --muted: #7a8a7e;
-    --red: #ff4757;
-    --done-bg: rgba(181,255,71,0.06);
-    --done-border: rgba(181,255,71,0.25);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 400;
-    line-height: 1.6;
-    min-height: 100vh;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(181,255,71,0.04) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 80% 90%, rgba(71,255,212,0.03) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 16px 80px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ── HEADER ── */
-  .hero {
-    text-align: center;
-    padding: 48px 0 40px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 40px;
-  }
-
-  .hero-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 14px;
-    display: block;
-  }
-
-  .hero h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(48px, 10vw, 80px);
-    letter-spacing: 2px;
-    line-height: 0.95;
-    color: var(--text);
-    margin-bottom: 16px;
-  }
-
-  .hero h1 span { color: var(--accent); }
-
-  .hero-sub {
-    color: var(--muted);
-    font-size: 14px;
-    max-width: 460px;
-    margin: 0 auto 28px;
-  }
-
-  .stats-row {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .stat-chip {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 40px;
-    padding: 6px 14px;
-    font-size: 12px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .stat-chip strong { color: var(--accent); }
-
-  /* ── PROGRESS BAR ── */
-  .progress-section {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 22px 24px;
-    margin-bottom: 36px;
-  }
-
-  .progress-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .progress-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 1px;
-  }
-
-  .progress-count {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--accent);
-  }
-
-  .progress-bar-track {
-    background: var(--border);
-    border-radius: 8px;
-    height: 8px;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    border-radius: 8px;
-    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
-    width: 0%;
-  }
-
-  .progress-sub {
-    font-size: 12px;
-    color: var(--muted);
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .reset-btn {
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    border-radius: 6px;
-    padding: 4px 12px;
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 1px;
-  }
-
-  .reset-btn:hover { border-color: var(--red); color: var(--red); }
-
-  /* ── SECTION ── */
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .section-number {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 12px;
-    color: var(--accent);
-    letter-spacing: 2px;
-    border: 1px solid var(--accent);
-    border-radius: 4px;
-    padding: 2px 8px;
-  }
-
-  .section-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 26px;
-    letter-spacing: 1px;
-  }
-
-  section { margin-bottom: 52px; }
-
-  /* ── PHASE BANNER ── */
-  .phase-banner {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--accent);
-    border-radius: 12px;
-    padding: 18px 22px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-
-  .phase-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--accent);
-    text-transform: uppercase;
-  }
-
-  .phase-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 1px;
-  }
-
-  .phase-duration {
-    margin-left: auto;
-    background: rgba(181,255,71,0.1);
-    color: var(--accent);
-    border-radius: 20px;
-    padding: 3px 12px;
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* ── WEEK GRID ── */
-  .week-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  /* ── DAY CARD ── */
-  .day-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px;
-    transition: border-color 0.2s, transform 0.2s, background 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .day-card:hover { border-color: rgba(181,255,71,0.4); transform: translateY(-2px); }
-
-  .day-card.rest { border-style: dashed; }
-
-  .day-card.completed {
-    background: var(--done-bg);
-    border-color: var(--done-border);
-    border-style: solid;
-  }
-
-  .day-card.completed .day-name { color: var(--accent); }
-
-  /* Completion shimmer */
-  .day-card.completed::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent 40%, rgba(181,255,71,0.04) 100%);
-    pointer-events: none;
-  }
-
-  .day-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 6px;
-  }
-
-  .day-tag {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
-  /* ── CHECK BUTTON ── */
-  .check-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    background: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
-    flex-shrink: 0;
-    color: var(--muted);
-    font-size: 13px;
-  }
-
-  .check-btn:hover {
-    border-color: var(--accent);
-    background: rgba(181,255,71,0.1);
-    color: var(--accent);
-    transform: scale(1.1);
-  }
-
-  .check-btn.checked {
-    border-color: var(--accent);
-    background: var(--accent);
-    color: var(--bg);
-    box-shadow: 0 0 12px rgba(181,255,71,0.4);
-  }
-
-  .check-btn.checked:hover {
-    background: rgba(181,255,71,0.7);
-    transform: scale(1.1);
-  }
-
-  .day-name {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 17px;
-    letter-spacing: 1px;
-    margin-bottom: 3px;
-    transition: color 0.3s;
-  }
-
-  .day-focus {
-    font-size: 11px;
-    color: var(--accent2);
-    margin-bottom: 12px;
-    font-weight: 500;
-  }
-
-  .day-card.rest .day-focus { color: var(--muted); }
-
-  .exercise-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .exercise-list li {
-    font-size: 12px;
-    color: var(--muted);
-    display: flex;
-    align-items: baseline;
-    gap: 7px;
-  }
-
-  .exercise-list li::before {
-    content: '→';
-    color: var(--accent);
-    font-size: 10px;
-    flex-shrink: 0;
-  }
-
-  .exercise-list li span { color: var(--text); font-weight: 500; }
-
-  .cardio-badge {
-    display: inline-block;
-    background: rgba(255,107,53,0.15);
-    color: var(--accent3);
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 9px;
-    font-family: 'DM Mono', monospace;
-    margin-left: 3px;
-    vertical-align: middle;
-  }
-
-  .hiit-badge {
-    display: inline-block;
-    background: rgba(255,71,87,0.12);
-    color: #ff6b6b;
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 9px;
-    font-family: 'DM Mono', monospace;
-    margin-left: 3px;
-    vertical-align: middle;
-  }
-
-  /* ── CALORIE BOX ── */
-  .calorie-box {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 22px;
-    margin: 14px 0;
-    display: flex;
-    gap: 28px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .calorie-big {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 34px;
-    color: var(--accent);
-    line-height: 1;
-  }
-
-  .calorie-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-bottom: 3px;
-  }
-
-  /* ── WARNING ── */
-  .warning {
-    background: rgba(255,71,87,0.08);
-    border: 1px solid rgba(255,71,87,0.2);
-    border-radius: 10px;
-    padding: 14px 18px;
-    font-size: 13px;
-    color: #ff8a94;
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    margin-top: 14px;
-  }
-
-  .warning::before { content: '⚠️'; flex-shrink: 0; }
-
-  .tip-box {
-    background: rgba(71,255,212,0.06);
-    border: 1px solid rgba(71,255,212,0.2);
-    border-radius: 10px;
-    padding: 14px 18px;
-    font-size: 13px;
-    color: var(--accent2);
-    margin-bottom: 20px;
-  }
-
-  /* ── INFO GRID ── */
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 12px;
-  }
-
-  .info-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-  }
-
-  .info-card .icon { font-size: 22px; margin-bottom: 10px; display: block; }
-  .info-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 1px; margin-bottom: 8px; }
-  .info-card p, .info-card li { font-size: 12px; color: var(--muted); line-height: 1.7; }
-  .info-card ul { list-style: none; }
-  .info-card ul li::before { content: '• '; color: var(--accent); }
-
-  /* ── NUTRITION TABLE ── */
-  .watch-box {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-    margin-bottom: 12px;
-  }
-
-  .watch-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; margin-bottom: 14px; }
-
-  .nutrition-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .nutrition-table th { text-align: left; padding: 10px 14px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
-  .nutrition-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; }
-  .nutrition-table td:first-child { font-weight: 500; color: var(--text); }
-  .nutrition-table tr:hover td { background: rgba(255,255,255,0.02); }
-  .macro-highlight { background: rgba(181,255,71,0.08); color: var(--accent); border-radius: 4px; padding: 2px 7px; font-family: 'DM Mono', monospace; font-size: 11px; }
-
-  /* ── TIMELINE ── */
-  .timeline { position: relative; padding-left: 28px; }
-  .timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: var(--border); }
-  .timeline-item { position: relative; margin-bottom: 24px; }
-  .timeline-item::before { content: ''; position: absolute; left: -25px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px rgba(181,255,71,0.5); }
-  .timeline-item.done::before { background: var(--muted); box-shadow: none; }
-  .timeline-item.done { opacity: 0.5; }
-  .timeline-item.current::before { background: var(--accent2); box-shadow: 0 0 12px rgba(71,255,212,0.6); animation: pulse 2s infinite; }
-
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 8px rgba(71,255,212,0.6); }
-    50% { box-shadow: 0 0 18px rgba(71,255,212,0.9); }
-  }
-
-  .timeline-week { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 2px; margin-bottom: 3px; }
-  .timeline-title { font-weight: 600; color: var(--text); margin-bottom: 3px; font-size: 14px; }
-  .timeline-desc { font-size: 12px; color: var(--muted); }
-
-  /* ── WATCH STEPS ── */
-  .watch-steps { display: flex; flex-direction: column; gap: 12px; }
-  .watch-step { display: flex; gap: 14px; align-items: flex-start; }
-  .step-num { background: var(--accent); color: var(--bg); border-radius: 50%; width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 700; }
-  .watch-step-content strong { display: block; font-size: 13px; color: var(--text); margin-bottom: 2px; }
-  .watch-step-content p { font-size: 12px; color: var(--muted); }
-
-  /* ── DIVIDER ── */
-  hr.divider { border: none; border-top: 1px solid var(--border); margin: 44px 0; }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--accent);
-    color: var(--bg);
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 1px;
-    padding: 10px 22px;
-    border-radius: 40px;
-    font-weight: 700;
-    z-index: 999;
-    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-    white-space: nowrap;
-    pointer-events: none;
-  }
-
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* ── GOAL CARD ── */
-  .goal-card {
-    background: linear-gradient(135deg, rgba(181,255,71,0.07), rgba(71,255,212,0.04));
-    border: 1px solid rgba(181,255,71,0.18);
-    border-radius: 16px;
-    padding: 28px;
-    text-align: center;
-    margin-bottom: 36px;
-  }
-
-  .goal-card h2 { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 2px; margin-bottom: 6px; }
-  .goal-card p { color: var(--muted); font-size: 13px; max-width: 440px; margin: 0 auto; }
-  .goal-numbers { display: flex; justify-content: center; gap: 36px; margin: 20px 0; flex-wrap: wrap; }
-  .goal-num { text-align: center; }
-  .goal-num .big { font-family: 'Bebas Neue', sans-serif; font-size: 44px; line-height: 1; display: block; }
-  .goal-num .big.green { color: var(--accent); }
-  .goal-num .big.cyan { color: var(--accent2); }
-  .goal-num .big.orange { color: var(--accent3); }
-  .goal-num small { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 1px; }
-
-  .footer-text { text-align: center; padding: 36px 0 16px; color: var(--muted); font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 1px; }
-
-  @media (max-width: 600px) {
-    .week-grid { grid-template-columns: 1fr; }
-    .hero h1 { font-size: 52px; }
-    .goal-numbers { gap: 20px; }
-    .calorie-box { gap: 14px; }
-  }
+:root {
+  --bg: #0f0e0b;
+  --card: #171612;
+  --card2: #1e1c16;
+  --border: #2c2a22;
+  --border2: #3a3830;
+  --gold: #d4a837;
+  --gold-dim: rgba(212,168,55,0.12);
+  --gold-glow: rgba(212,168,55,0.3);
+  --white: #ede9e0;
+  --muted: #7a7465;
+  --muted2: #4e4a40;
+  --green: #6dcc5a;
+  --green-dim: rgba(109,204,90,0.1);
+  --green-glow: rgba(109,204,90,0.3);
+  --red: #e05a3a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+  padding-bottom:max(60px,env(safe-area-inset-bottom,0px)+20px);
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 70% 45% at 10% 0%, rgba(212,168,55,0.04) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(212,168,55,0.03) 0%,transparent 55%);
+  pointer-events:none;z-index:0;
+}
+
+.wrap{max-width:640px;margin:0 auto;padding:0 14px;position:relative;z-index:1;}
+
+/* ── HERO ── */
+.hero{
+  text-align:center;
+  padding:40px 0 28px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:24px;
+}
+.hero-crown{font-size:28px;margin-bottom:6px;}
+.hero h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(48px,14vw,78px);
+  letter-spacing:3px;line-height:0.9;
+  margin-bottom:6px;
+}
+.hero h1 em{color:var(--gold);font-style:normal;}
+.hero-tagline{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:14px;letter-spacing:4px;
+  color:var(--muted);margin-bottom:20px;
+}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.chip{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:30px;padding:5px 12px;
+  font-size:11px;font-family:'DM Mono',monospace;
+}
+.chip strong{color:var(--gold);}
+
+/* ── PROGRESS ── */
+.progress-box{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:16px 16px 14px;margin-bottom:22px;
+}
+.progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap;}
+.progress-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;}
+.progress-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);}
+.bar-track{background:var(--border2);border-radius:6px;height:6px;overflow:hidden;margin-bottom:10px;}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),#f0c84a);border-radius:6px;width:0%;transition:width 0.5s cubic-bezier(.4,0,.2,1);}
+.progress-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+.progress-msg{font-size:12px;color:var(--muted);}
+.reset-btn{
+  background:none;border:1px solid var(--border2);color:var(--muted);
+  border-radius:6px;padding:4px 10px;font-size:10px;
+  font-family:'DM Mono',monospace;cursor:pointer;letter-spacing:1px;
+  transition:border-color 0.2s,color 0.2s;white-space:nowrap;
+}
+.reset-btn:active{border-color:var(--red);color:var(--red);}
+
+/* ── SECTION HEAD ── */
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.sec-num{font-family:'Bebas Neue',sans-serif;font-size:11px;color:var(--gold);letter-spacing:2px;border:1px solid var(--gold);border-radius:4px;padding:2px 7px;}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;}
+section{margin-bottom:40px;}
+
+/* ── WORKOUT RULE STRIP ── */
+.rule-strip{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;margin-bottom:22px;
+}
+.rule-item{padding:14px 12px;border-right:1px solid var(--border);}
+.rule-item:last-child{border-right:none;}
+.rule-icon{font-size:18px;margin-bottom:6px;}
+.rule-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:var(--gold);margin-bottom:4px;}
+.rule-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+
+/* ── DAY CARDS ── */
+.days{display:flex;flex-direction:column;gap:10px;}
+
+.day-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  transition:border-color 0.25s;
+}
+.day-card.completed{
+  background:#151410;
+  border-color:rgba(109,204,90,0.28);
+}
+
+/* header */
+.day-head{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 14px 12px;cursor:pointer;user-select:none;
+}
+.day-head:active{background:rgba(255,255,255,0.02);}
+
+.day-check{
+  width:34px;height:34px;flex-shrink:0;
+  border-radius:50%;border:2px solid var(--border2);
+  background:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.22s;position:relative;
+  font-size:16px;color:transparent;
+}
+.day-check::after{content:'✓';position:absolute;color:var(--muted2);font-size:15px;font-weight:700;}
+.day-check.partial{border-color:var(--gold);border-style:dashed;}
+.day-check.partial::after{color:var(--gold);}
+.day-check.done{
+  border-color:var(--green);background:var(--green);
+  box-shadow:0 0 12px var(--green-glow);
+}
+.day-check.done::after{color:#0f0e0b;}
+
+.day-info{flex:1;min-width:0;}
+.day-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.day-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px;line-height:1.1;}
+.day-card.completed .day-name{color:var(--green);}
+.day-focus{font-size:11px;color:var(--gold);font-weight:500;margin-top:1px;opacity:0.8;}
+
+.day-meta{text-align:right;flex-shrink:0;}
+.day-counter{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.day-chevron{font-size:10px;color:var(--muted2);margin-top:3px;transition:transform 0.25s;display:block;}
+.day-card.open .day-chevron{transform:rotate(180deg);}
+
+/* body */
+.day-body{display:none;padding:0 12px 14px;border-top:1px solid var(--border);}
+.day-card.open .day-body{display:block;}
+
+/* exercise rows */
+.ex-list{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:2px;}
+
+.ex-item{
+  display:flex;align-items:center;gap:11px;
+  padding:10px 8px;border-radius:8px;
+  cursor:pointer;transition:background 0.15s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.ex-item:active{background:rgba(255,255,255,0.03);}
+.ex-item.done-ex{background:rgba(109,204,90,0.05);}
+
+.ex-tick{
+  width:24px;height:24px;flex-shrink:0;
+  border-radius:6px;border:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:transparent;
+  transition:all 0.18s;
+}
+.ex-item.done-ex .ex-tick{background:var(--green);border-color:var(--green);color:#0f0e0b;}
+
+.ex-text{flex:1;min-width:0;}
+.ex-name{font-size:14px;font-weight:500;color:var(--white);transition:color 0.2s;line-height:1.3;}
+.ex-sets{font-size:11px;color:var(--muted);margin-top:1px;font-family:'DM Mono',monospace;}
+.ex-item.done-ex .ex-name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted2);}
+
+/* ── TIP BOX ── */
+.tip{
+  background:rgba(212,168,55,0.06);border:1px solid rgba(212,168,55,0.18);
+  border-radius:10px;padding:12px 14px;font-size:12px;
+  color:rgba(212,168,55,0.9);margin-bottom:16px;line-height:1.6;
+}
+
+/* ── INFO GRID ── */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.info-card .ico{font-size:20px;margin-bottom:8px;display:block;}
+.info-card h3{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--gold);margin-bottom:6px;}
+.info-card p,.info-card li{font-size:12px;color:var(--muted);line-height:1.65;}
+.info-card ul{list-style:none;}
+.info-card li::before{content:'• ';color:var(--gold);}
+
+/* ── NUTRITION TABLE ── */
+.tbl-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
+.tbl-box h3{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--gold);margin-bottom:12px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:8px 10px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,0.03);}
+td:first-child{font-weight:500;color:var(--white);}
+tr:last-child td{border-bottom:none;}
+.hl{background:var(--gold-dim);color:var(--gold);border-radius:4px;padding:2px 6px;font-family:'DM Mono',monospace;font-size:10px;}
+
+/* ── DIVIDER ── */
+hr{border:none;border-top:1px solid var(--border);margin:32px 0;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(70px);
+  background:var(--green);color:#0f0e0b;
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;
+  padding:10px 20px;border-radius:30px;font-weight:700;
+  z-index:999;pointer-events:none;white-space:nowrap;
+  transition:transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── FOOTER ── */
+.footer{
+  text-align:center;padding:24px 0 10px;
+  color:var(--muted2);font-size:10px;
+  font-family:'DM Mono',monospace;letter-spacing:2px;
+}
+.footer em{color:var(--gold);font-style:normal;}
+
+@media(max-width:400px){
+  .rule-strip{grid-template-columns:1fr;}
+  .rule-item{border-right:none;border-bottom:1px solid var(--border);}
+  .rule-item:last-child{border-bottom:none;}
+}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
 
-  <!-- HERO -->
-  <div class="hero">
-    <span class="hero-label">Updated · Week 3+ · Intermediate Phase</span>
-    <h1>MY <span>GYM</span><br>BLUEPRINT</h1>
-    <p class="hero-sub">2 weeks done — foundation built. Now on an intermediate weight training split for maximum fat loss.</p>
-    <div class="stats-row">
-      <div class="stat-chip">Age <strong>31</strong></div>
-      <div class="stat-chip">Height <strong>5'7"</strong></div>
-      <div class="stat-chip">Start <strong>80 kg</strong></div>
-      <div class="stat-chip">Target <strong>68 kg</strong></div>
-      <div class="stat-chip">Timeline <strong>~22 weeks</strong></div>
-    </div>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-crown">👑</div>
+  <h1>WEEKLY<br><em>GYM SPLIT</em></h1>
+  <div class="hero-tagline">Simple · Consistent · Results</div>
+  <div class="chips">
+    <div class="chip">Start <strong>80 kg</strong></div>
+    <div class="chip">Target <strong>68 kg</strong></div>
+    <div class="chip">Rate <strong>~0.8 kg/wk</strong></div>
+    <div class="chip">5 <strong>sessions/week</strong></div>
   </div>
-
-  <!-- PROGRESS TRACKER -->
-  <div class="progress-section">
-    <div class="progress-header">
-      <span class="progress-title">Weekly Progress</span>
-      <span class="progress-count" id="progressCount">0 / 5 sessions done</span>
-    </div>
-    <div class="progress-bar-track">
-      <div class="progress-bar-fill" id="progressFill"></div>
-    </div>
-    <div class="progress-sub">
-      <span id="progressMsg">Mark sessions complete as you go 💪</span>
-      <button class="reset-btn" onclick="resetWeek()">RESET WEEK</button>
-    </div>
-  </div>
-
-  <!-- GOAL -->
-  <div class="goal-card">
-    <h2>YOUR 6-MONTH MISSION</h2>
-    <div class="goal-numbers">
-      <div class="goal-num"><span class="big green">−12</span><small>KG TO LOSE</small></div>
-      <div class="goal-num"><span class="big cyan">~500</span><small>DAILY CAL DEFICIT</small></div>
-      <div class="goal-num"><span class="big orange">5×</span><small>WORKOUTS/WEEK</small></div>
-    </div>
-    <p>0.7–0.9 kg/week loss rate with this plan. Steady and sustainable.</p>
-  </div>
-
-  <!-- SECTION 1: TRAINING -->
-  <section>
-    <div class="section-header">
-      <span class="section-number">01</span>
-      <span class="section-title">Training Plan</span>
-    </div>
-
-    <!-- Phase 1 DONE -->
-    <div class="phase-banner" style="opacity:0.45; border-left-color:var(--muted);">
-      <div>
-        <div class="phase-label" style="color:var(--muted)">Phase 1 · ✅ Completed</div>
-        <div class="phase-title" style="color:var(--muted)">Foundation & Cardio Adaptation</div>
-      </div>
-      <div class="phase-duration" style="background:rgba(122,138,126,0.1); color:var(--muted)">Weeks 1–2 · Done</div>
-    </div>
-    <p style="color:var(--muted); font-size:12px; margin-bottom:28px; padding-left:4px;">✓ Treadmill · Cycling · Cross Trainer — base cardio fitness established. Well done.</p>
-
-    <!-- Phase 2 CURRENT -->
-    <div class="phase-banner" style="border-left-color:var(--accent2);">
-      <div>
-        <div class="phase-label" style="color:var(--accent2)">Phase 2 · 🔥 You Are Here</div>
-        <div class="phase-title">Intermediate: Push / Pull / Legs Split</div>
-      </div>
-      <div class="phase-duration" style="background:rgba(71,255,212,0.1); color:var(--accent2)">Weeks 3–12</div>
-    </div>
-
-    <div class="tip-box" style="margin-top:16px;">
-      💡 <strong>Progressive Overload:</strong> Add 2.5kg every time you complete all reps cleanly. Rest 60–90s between sets for compounds, 45–60s for isolation. Tap the ✓ button on each day to track your week.
-    </div>
-
-    <div class="week-grid">
-
-      <!-- MON -->
-      <div class="day-card" id="day-mon">
-        <div class="day-card-top">
-          <span class="day-tag">Monday</span>
-          <button class="check-btn" id="btn-mon" onclick="toggleDay('mon')" title="Mark complete">✓</button>
-        </div>
-        <div class="day-name">Push Day</div>
-        <div class="day-focus">Chest · Shoulders · Triceps</div>
-        <ul class="exercise-list">
-          <li><span>Barbell Bench Press</span> — 4×8–10</li>
-          <li><span>Incline DB Press</span> — 3×10</li>
-          <li><span>Cable Chest Fly</span> — 3×12</li>
-          <li><span>Seated DB Shoulder Press</span> — 3×10</li>
-          <li><span>Lateral Raises</span> — 3×15</li>
-          <li><span>Tricep Rope Pushdown</span> — 3×12</li>
-          <li><span>Overhead DB Tricep Ext.</span> — 3×12</li>
-          <li><span>Treadmill — 20 min, incline 5, speed 5.5</span><span class="cardio-badge">CARDIO</span></li>
-        </ul>
-      </div>
-
-      <!-- TUE -->
-      <div class="day-card" id="day-tue">
-        <div class="day-card-top">
-          <span class="day-tag">Tuesday</span>
-          <button class="check-btn" id="btn-tue" onclick="toggleDay('tue')" title="Mark complete">✓</button>
-        </div>
-        <div class="day-name">Pull Day</div>
-        <div class="day-focus">Back · Biceps · Rear Delts</div>
-        <ul class="exercise-list">
-          <li><span>Barbell Deadlift</span> — 4×6 <em style="color:var(--muted);font-size:10px;">(focus on form)</em></li>
-          <li><span>Lat Pulldown</span> — 4×10</li>
-          <li><span>Seated Cable Row</span> — 3×10</li>
-          <li><span>Single-Arm DB Row</span> — 3×10 each</li>
-          <li><span>Face Pulls</span> — 3×15</li>
-          <li><span>Barbell Curl</span> — 3×12</li>
-          <li><span>Hammer Curl</span> — 3×12</li>
-          <li><span>Cross Trainer — 20 min, resistance 7</span><span class="cardio-badge">CARDIO</span></li>
-        </ul>
-      </div>
-
-      <!-- WED -->
-      <div class="day-card" id="day-wed">
-        <div class="day-card-top">
-          <span class="day-tag">Wednesday</span>
-          <button class="check-btn" id="btn-wed" onclick="toggleDay('wed')" title="Mark complete">✓</button>
-        </div>
-        <div class="day-name">Leg Day</div>
-        <div class="day-focus">Quads · Hamstrings · Glutes · Calves</div>
-        <ul class="exercise-list">
-          <li><span>Barbell Back Squat</span> — 4×8</li>
-          <li><span>Romanian Deadlift (DB)</span> — 3×10</li>
-          <li><span>Leg Press Machine</span> — 3×12</li>
-          <li><span>Leg Curl Machine</span> — 3×12</li>
-          <li><span>Walking Lunges</span> — 3×12 each leg</li>
-          <li><span>Standing Calf Raises</span> — 4×15</li>
-          <li><span>Cycling — 20 min sprint intervals</span><span class="hiit-badge">HIIT</span></li>
-        </ul>
-      </div>
-
-      <!-- THU REST -->
-      <div class="day-card rest" id="day-thu">
-        <div class="day-card-top">
-          <span class="day-tag">Thursday</span>
-          <button class="check-btn" id="btn-thu" onclick="toggleDay('thu')" title="Mark complete">✓</button>
-        </div>
-        <div class="day-name">Active Rest + Core</div>
-        <div class="day-focus">Recovery Day</div>
-        <ul class="exercise-list">
-          <li><span>Plank</span> — 3×45s</li>
-          <li><span>Dead Bug</span> — 3×10 each side</li>
-          <li><span>Russian Twists</span> — 3×20</li>
-          <li><span>30 min brisk walk</span> outdoors</li>
-          <li><span>Full body stretch</span> — 10 min</li>
-        </ul>
-      </div>
-
-      <!-- FRI -->
-      <div class="day-card" id="day-fri">
-        <div class="day-card-top">
-          <span class="day-tag">Friday</span>
-          <button class="check-btn" id="btn-fri" onclick="toggleDay('fri')" title="Mark complete">✓</button>
-        </div>
-        <div class="day-name">Upper Hypertrophy</div>
-        <div class="day-focus">Chest + Back Supersets</div>
-        <ul class="exercise-list">
-          <li><span>SS: DB Press + DB Row</span> — 4×10 each</li>
-          <li><span>SS: Cable Fly + Lat Pulldown</span> — 3×12 each</li>
-          <li><span>SS: Shoulder Press + Face Pulls</span> — 3×12 each</li>
-          <li><span>SS: Bicep Curl + Tricep Pushdown</span> — 3×12 each</li>
-          <li><span>Treadmill — 20 min, incline 6, speed 5</span><span class="cardio-badge">CARDIO</span></li>
-        </ul>
-      </div>
-
-      <!-- SAT -->
-      <div class="day-card" id="day-sat">
-        <div class="day-card-top">
-          <span class="day-tag">Saturday</span>
-          <button class="check-btn" id="btn-sat" onclick="toggleDay('sat')" title="Mark complete">✓</button>
-        </div>
-        <div class="day-name">HIIT + Core Finisher</div>
-        <div class="day-focus">Max Calorie Burn Day</div>
-        <ul class="exercise-list">
-          <li><span>Cycling HIIT</span> — 30s sprint / 90s easy × 10</li>
-          <li><span>Cross Trainer</span> — 15 min steady</li>
-          <li><span>Cable Crunch</span> — 3×15</li>
-          <li><span>Hanging Knee Raise</span> — 3×12</li>
-          <li><span>Plank to Push-up</span> — 3×10</li>
-          <li><span>Mountain Climbers</span> — 3×20</li>
-        </ul>
-      </div>
-
-      <!-- SUN REST -->
-      <div class="day-card rest" id="day-sun">
-        <div class="day-card-top">
-          <span class="day-tag">Sunday</span>
-          <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:18px;">😴</div>
-        </div>
-        <div class="day-name">Full Rest</div>
-        <div class="day-focus">Mandatory Recovery</div>
-        <ul class="exercise-list">
-          <li><span>Complete rest</span></li>
-          <li><span>Prioritize 8h sleep</span></li>
-          <li><span>Eat well, stay hydrated</span></li>
-        </ul>
-      </div>
-
-    </div>
-
-    <div class="calorie-box">
-      <div>
-        <div class="calorie-label">EST. WEEKLY CALORIE BURN</div>
-        <div class="calorie-big">2,200 – 2,800</div>
-        <div style="font-size:11px; color:var(--muted);">kcal from 5 workout sessions</div>
-      </div>
-      <div style="flex:1; min-width:180px;">
-        <div style="font-size:12px; color:var(--muted); line-height:1.8;">
-          Combined with your ~500 kcal/day dietary deficit, total weekly deficit is <strong style="color:var(--text)">~5,700–6,300 kcal</strong> → <strong style="color:var(--text)">0.7–0.9 kg/week</strong> loss.
-        </div>
-      </div>
-    </div>
-
-    <div class="warning">DOMS after leg day and push day is normal. Do NOT skip Thursday recovery — it's placed there intentionally between your hardest days.</div>
-
-    <!-- Phase 3 -->
-    <div class="phase-banner" style="margin-top:24px; border-left-color:var(--accent3);">
-      <div>
-        <div class="phase-label" style="color:var(--accent3)">Phase 3 · Upcoming</div>
-        <div class="phase-title">Cut & Define</div>
-      </div>
-      <div class="phase-duration" style="background:rgba(255,107,53,0.1); color:var(--accent3)">Weeks 13–24</div>
-    </div>
-    <p style="color:var(--muted); font-size:13px; margin-top:4px;">Supersets throughout, rest drops to 45s, weights heavier, extra HIIT session added. By now you'll look visibly different.</p>
-  </section>
-
-  <hr class="divider">
-
-  <!-- SECTION 2: CARDIO GUIDE -->
-  <section>
-    <div class="section-header">
-      <span class="section-number">02</span>
-      <span class="section-title">Cardio Machine Guide</span>
-    </div>
-    <div class="info-grid">
-      <div class="info-card">
-        <span class="icon">🏃</span>
-        <h3>Treadmill</h3>
-        <ul>
-          <li>Speed <strong style="color:var(--text)">5.5–6.5</strong> for fat burn zone</li>
-          <li>Incline <strong style="color:var(--text)">4–6</strong> burns more without running fast</li>
-          <li>Speed 3 is too slow — barely any calorie burn</li>
-        </ul>
-      </div>
-      <div class="info-card">
-        <span class="icon">🚴</span>
-        <h3>Cycling / Bike</h3>
-        <ul>
-          <li>Set resistance to <strong style="color:var(--text)">medium-high</strong></li>
-          <li>30s sprints → 90s easy × 10 rounds = HIIT</li>
-          <li>Knee-friendly and great for testosterone</li>
-        </ul>
-      </div>
-      <div class="info-card">
-        <span class="icon">⚙️</span>
-        <h3>Cross Trainer</h3>
-        <ul>
-          <li>Full-body, zero impact — excellent fat burn</li>
-          <li>Keep <strong style="color:var(--text)">RPM above 60</strong></li>
-          <li>Use arm handles actively, don't lean on them</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <!-- SECTION 3: NUTRITION -->
-  <section>
-    <div class="section-header">
-      <span class="section-number">03</span>
-      <span class="section-title">Nutrition Plan</span>
-    </div>
-    <div class="watch-box">
-      <h3>Daily Calorie & Macro Targets</h3>
-      <p style="color:var(--muted); font-size:12px; margin-bottom:18px;">Maintenance ~2,400 kcal/day. Eat ~1,900 kcal to lose weight steadily.</p>
-      <table class="nutrition-table">
-        <thead><tr><th>Macro</th><th>Daily Amount</th><th>Why It Matters</th></tr></thead>
-        <tbody>
-          <tr><td>Protein</td><td><span class="macro-highlight">140–160g</span></td><td style="color:var(--muted);font-size:11px;">Preserves muscle, boosts metabolism, keeps you full</td></tr>
-          <tr><td>Carbs</td><td><span class="macro-highlight">160–180g</span></td><td style="color:var(--muted);font-size:11px;">Fuel for workouts. Rice, oats, vegetables</td></tr>
-          <tr><td>Fats</td><td><span class="macro-highlight">50–60g</span></td><td style="color:var(--muted);font-size:11px;">Critical for testosterone. Don't cut fat too low</td></tr>
-          <tr><td>Water</td><td><span class="macro-highlight">3–4 litres</span></td><td style="color:var(--muted);font-size:11px;">Bangladesh heat = you sweat more. Stay hydrated</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="info-grid">
-      <div class="info-card">
-        <span class="icon">🍳</span>
-        <h3>Best Protein Sources</h3>
-        <ul>
-          <li>Eggs (5–6 daily)</li>
-          <li>Hilsa, Rohu, Catla fish</li>
-          <li>Chicken breast</li>
-          <li>Daal + rice combo</li>
-          <li>Greek yogurt / doi</li>
-        </ul>
-      </div>
-      <div class="info-card">
-        <span class="icon">🚫</span>
-        <h3>Avoid / Minimize</h3>
-        <ul>
-          <li>Sweetened drinks (cola, juice)</li>
-          <li>White bread & fried snacks</li>
-          <li>Mishti / sweets daily</li>
-          <li>Excess rice at dinner</li>
-          <li>Late-night eating</li>
-        </ul>
-      </div>
-      <div class="info-card">
-        <span class="icon">⚡</span>
-        <h3>Pre / Post Workout</h3>
-        <ul>
-          <li>Pre: banana + black coffee, 30 min before</li>
-          <li>Post: eggs + rice within 1 hour</li>
-          <li>Don't train fasted if feeling weak</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <!-- SECTION 4: TESTOSTERONE -->
-  <section>
-    <div class="section-header">
-      <span class="section-number">04</span>
-      <span class="section-title">Boosting Testosterone Naturally</span>
-    </div>
-    <div class="info-grid">
-      <div class="info-card">
-        <span class="icon">🏋️</span>
-        <h3>Train Heavy</h3>
-        <p>Squats, deadlifts, bench press trigger the largest testosterone response. Heavy compound lifts beat cardio for hormone health.</p>
-      </div>
-      <div class="info-card">
-        <span class="icon">😴</span>
-        <h3>Sleep 7–8 Hours</h3>
-        <p>70% of testosterone is produced during sleep. Even 1 week of 5–6h sleep drops T levels by 15%. Non-negotiable.</p>
-      </div>
-      <div class="info-card">
-        <span class="icon">🥚</span>
-        <h3>Eat Healthy Fats</h3>
-        <p>Testosterone is synthesized from cholesterol. Eggs, fish, nuts, and olive oil are essential. Never go very low-fat.</p>
-      </div>
-      <div class="info-card">
-        <span class="icon">☀️</span>
-        <h3>Morning Sunlight</h3>
-        <p>20–30 min of morning sun daily. Vitamin D deficiency is directly linked to low testosterone. Free and powerful.</p>
-      </div>
-      <div class="info-card">
-        <span class="icon">🧘</span>
-        <h3>Manage Stress</h3>
-        <p>Cortisol directly suppresses testosterone. Rest days aren't optional — they're when your hormones recover and grow.</p>
-      </div>
-      <div class="info-card">
-        <span class="icon">🥦</span>
-        <h3>Zinc & Magnesium</h3>
-        <p>Pumpkin seeds, red meat, spinach, almonds. These are directly involved in testosterone synthesis — deficiency is common in active men.</p>
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <!-- SECTION 5: APPLE WATCH -->
-  <section>
-    <div class="section-header">
-      <span class="section-number">05</span>
-      <span class="section-title">Apple Watch: Tracking Workouts</span>
-    </div>
-    <div class="watch-box">
-      <h3>How to Track Every Session</h3>
-      <div class="watch-steps">
-        <div class="watch-step">
-          <div class="step-num">1</div>
-          <div class="watch-step-content">
-            <strong>Open the Workout app</strong>
-            <p>Press Digital Crown → find green "Workout" icon. No phone needed.</p>
-          </div>
-        </div>
-        <div class="watch-step">
-          <div class="step-num">2</div>
-          <div class="watch-step-content">
-            <strong>For Cardio Machines</strong>
-            <p>Treadmill → "Indoor Walk/Run" · Cycling → "Indoor Cycle" · Cross Trainer → "Elliptical"</p>
-          </div>
-        </div>
-        <div class="watch-step">
-          <div class="step-num">3</div>
-          <div class="watch-step-content">
-            <strong>For Weight Training</strong>
-            <p>Select "Strength Training" — tracks heart rate, active calories, and time accurately.</p>
-          </div>
-        </div>
-        <div class="watch-step">
-          <div class="step-num">4</div>
-          <div class="watch-step-content">
-            <strong>Can't find it? Add it</strong>
-            <p>Scroll to bottom of Workout app → "Add Workout" → pin your most-used ones to the top.</p>
-          </div>
-        </div>
-        <div class="watch-step">
-          <div class="step-num">5</div>
-          <div class="watch-step-content">
-            <strong>Best companion app: Strong</strong>
-            <p>Download <strong>Strong</strong> (free, iOS) to log sets, reps, and weight. Pairs with Apple Health automatically.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="info-grid">
-      <div class="info-card">
-        <span class="icon">📱</span>
-        <h3>Recommended Apps</h3>
-        <ul>
-          <li><strong style="color:var(--text)">Strong</strong> — log weights & reps</li>
-          <li><strong style="color:var(--text)">MyFitnessPal</strong> — calorie tracking</li>
-          <li><strong style="color:var(--text)">Apple Health</strong> — see all data</li>
-        </ul>
-      </div>
-      <div class="info-card">
-        <span class="icon">🎯</span>
-        <h3>Key Metrics to Watch</h3>
-        <ul>
-          <li>Active Calories: target <strong style="color:var(--text)">400–600/session</strong></li>
-          <li>Heart Rate: <strong style="color:var(--text)">130–150 BPM</strong> fat burn zone</li>
-          <li>Resting HR: should drop over weeks</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider">
-
-  <!-- SECTION 6: TIMELINE -->
-  <section>
-    <div class="section-header">
-      <span class="section-number">06</span>
-      <span class="section-title">What to Expect & When</span>
-    </div>
-    <div class="timeline">
-      <div class="timeline-item done">
-        <div class="timeline-week">WEEK 1–2 · ✅ COMPLETED</div>
-        <div class="timeline-title">Foundation: Cardio & Adaptation</div>
-        <div class="timeline-desc">Treadmill, cycling, cross trainer — base cardio built. Body adapted. Well done.</div>
-      </div>
-      <div class="timeline-item current">
-        <div class="timeline-week" style="color:var(--accent2);">WEEK 3–6 · 📍 YOU ARE HERE</div>
-        <div class="timeline-title">Weight Training Begins</div>
-        <div class="timeline-desc">Expect DOMS after leg and push days. Energy rises noticeably. 1.5–2.5 kg lost. Clothes feeling looser by week 6.</div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-week">WEEK 6–8</div>
-        <div class="timeline-title">Visible Strength Gains</div>
-        <div class="timeline-desc">Lifting significantly heavier. 3–4 kg lost. Waist noticeably smaller. Cardio becomes easy — increase intensity.</div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-week">WEEK 12</div>
-        <div class="timeline-title">Major Transformation</div>
-        <div class="timeline-desc">~5–6 kg lost. Muscle definition visible. Energy high. Sex drive clearly improved. People will start noticing.</div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-week">WEEK 24</div>
-        <div class="timeline-title">Goal Reached: 68 kg</div>
-        <div class="timeline-desc">Target weight achieved. Significant muscle gain. Endurance transformed. A sustainable habit for life.</div>
-      </div>
-    </div>
-  </section>
-
-  <div class="footer-text">CONSISTENCY > PERFECTION · SHOW UP EVEN ON BAD DAYS · THE RESULTS FOLLOW</div>
-
 </div>
 
-<!-- TOAST -->
+<!-- PROGRESS -->
+<div class="progress-box">
+  <div class="progress-top">
+    <span class="progress-title">This Week</span>
+    <span class="progress-count" id="pCount">0 / 5 sessions</span>
+  </div>
+  <div class="bar-track"><div class="bar-fill" id="pFill"></div></div>
+  <div class="progress-bottom">
+    <span class="progress-msg" id="pMsg">Tap exercises to track 💪</span>
+    <button class="reset-btn" onclick="resetWeek()">RESET WEEK</button>
+  </div>
+</div>
+
+<!-- WORKOUT RULES -->
+<div class="rule-strip">
+  <div class="rule-item">
+    <div class="rule-icon">🏃</div>
+    <div class="rule-title">Before Every Workout</div>
+    <div class="rule-desc">Warm-up + 5 min Treadmill</div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-icon">🧘</div>
+    <div class="rule-title">After Every Workout</div>
+    <div class="rule-desc">5 min Stretching + 10 min Incline Treadmill</div>
+  </div>
+  <div class="rule-item">
+    <div class="rule-icon">🎯</div>
+    <div class="rule-title">Focus On</div>
+    <div class="rule-desc">Form. Consistency. Progress.</div>
+  </div>
+</div>
+
+<!-- SECTION: TRAINING -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <span class="sec-title">Training Days</span>
+  </div>
+
+  <div class="tip">
+    💡 Tap a day to expand. Tap each exercise to tick it off ✓. Day auto-completes when all exercises are done. Tap the circle to manually mark the whole day.
+  </div>
+
+  <div class="days" id="daysContainer">
+
+    <!-- MONDAY: LEGS -->
+    <div class="day-card" id="dc-mon">
+      <div class="day-head" onclick="toggleOpen('mon')">
+        <button class="day-check" id="chk-mon" onclick="manualDay(event,'mon')"></button>
+        <div class="day-info">
+          <div class="day-tag">Monday</div>
+          <div class="day-name">Legs</div>
+          <div class="day-focus">Glutes + Quads</div>
+        </div>
+        <div class="day-meta">
+          <div class="day-counter" id="cnt-mon">0/4</div>
+          <span class="day-chevron">▾</span>
+        </div>
+      </div>
+      <div class="day-body">
+        <ul class="ex-list" id="ex-mon" data-exercises='[
+          {"n":"Squats (Bodyweight → Barbell)","s":"3 × 8–10 reps"},
+          {"n":"Leg Press","s":"3 × 10 reps"},
+          {"n":"Crusty Lunges","s":"3 × 10 reps"},
+          {"n":"Standing Calf Raises","s":"3 × 15 reps"}
+        ]'></ul>
+      </div>
+    </div>
+
+    <!-- TUESDAY: PULL -->
+    <div class="day-card" id="dc-tue">
+      <div class="day-head" onclick="toggleOpen('tue')">
+        <button class="day-check" id="chk-tue" onclick="manualDay(event,'tue')"></button>
+        <div class="day-info">
+          <div class="day-tag">Tuesday</div>
+          <div class="day-name">Pull</div>
+          <div class="day-focus">Back + Biceps</div>
+        </div>
+        <div class="day-meta">
+          <div class="day-counter" id="cnt-tue">0/4</div>
+          <span class="day-chevron">▾</span>
+        </div>
+      </div>
+      <div class="day-body">
+        <ul class="ex-list" id="ex-tue" data-exercises='[
+          {"n":"Hyperextension","s":"3 × 10 reps"},
+          {"n":"Barbell Row","s":"3 × 12 reps"},
+          {"n":"Bicep Curls","s":"3 × 12 reps"},
+          {"n":"Bicep Hammer Curls","s":"3 × 10 reps"}
+        ]'></ul>
+      </div>
+    </div>
+
+    <!-- WEDNESDAY: REST -->
+    <div class="day-card" style="opacity:0.38;pointer-events:none;">
+      <div class="day-head">
+        <div style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🛌</div>
+        <div class="day-info">
+          <div class="day-tag">Wednesday</div>
+          <div class="day-name">Rest Day</div>
+          <div class="day-focus" style="color:var(--muted)">Recovery</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THURSDAY: LEGS (Hamstrings) -->
+    <div class="day-card" id="dc-thu">
+      <div class="day-head" onclick="toggleOpen('thu')">
+        <button class="day-check" id="chk-thu" onclick="manualDay(event,'thu')"></button>
+        <div class="day-info">
+          <div class="day-tag">Thursday</div>
+          <div class="day-name">Legs</div>
+          <div class="day-focus">Hamstrings + Glutes Focus</div>
+        </div>
+        <div class="day-meta">
+          <div class="day-counter" id="cnt-thu">0/4</div>
+          <span class="day-chevron">▾</span>
+        </div>
+      </div>
+      <div class="day-body">
+        <ul class="ex-list" id="ex-thu" data-exercises='[
+          {"n":"Leg Curl","s":"3 × 12 reps"},
+          {"n":"Walking Lunges","s":"3 × 10 reps (each leg)"},
+          {"n":"Leg Extension","s":"3 × 12 reps"},
+          {"n":"Calf Raises","s":"3 × 15 reps"}
+        ]'></ul>
+      </div>
+    </div>
+
+    <!-- FRIDAY: FULL BODY + CARDIO -->
+    <div class="day-card" id="dc-fri">
+      <div class="day-head" onclick="toggleOpen('fri')">
+        <button class="day-check" id="chk-fri" onclick="manualDay(event,'fri')"></button>
+        <div class="day-info">
+          <div class="day-tag">Friday</div>
+          <div class="day-name">Full Body + Cardio</div>
+          <div class="day-focus">Strength + Conditioning</div>
+        </div>
+        <div class="day-meta">
+          <div class="day-counter" id="cnt-fri">0/6</div>
+          <span class="day-chevron">▾</span>
+        </div>
+      </div>
+      <div class="day-body">
+        <ul class="ex-list" id="ex-fri" data-exercises='[
+          {"n":"Light Squats","s":"2 × 12 reps"},
+          {"n":"Push-ups","s":"2 × 10 reps"},
+          {"n":"Lat Pulldown","s":"2 × 10 reps"},
+          {"n":"Dumbbell Shoulder Press","s":"2 × 10 reps"},
+          {"n":"Plank","s":"2 × 30 seconds"},
+          {"n":"Cardio — Walking / Cycling","s":"15–20 minutes"}
+        ]'></ul>
+      </div>
+    </div>
+
+    <!-- SATURDAY: PUSH -->
+    <div class="day-card" id="dc-sat">
+      <div class="day-head" onclick="toggleOpen('sat')">
+        <button class="day-check" id="chk-sat" onclick="manualDay(event,'sat')"></button>
+        <div class="day-info">
+          <div class="day-tag">Saturday</div>
+          <div class="day-name">Push</div>
+          <div class="day-focus">Chest · Shoulders · Triceps</div>
+        </div>
+        <div class="day-meta">
+          <div class="day-counter" id="cnt-sat">0/5</div>
+          <span class="day-chevron">▾</span>
+        </div>
+      </div>
+      <div class="day-body">
+        <ul class="ex-list" id="ex-sat" data-exercises='[
+          {"n":"Bench Press or Machine Press","s":"3 × 8–10 reps"},
+          {"n":"Incline Dumbbell Press","s":"3 × 10 reps"},
+          {"n":"Shoulder Press (DB / Machine)","s":"3 × 10 reps"},
+          {"n":"Lateral Raises","s":"3 × 12–15 reps"},
+          {"n":"Tricep Extension","s":"3 × 12 reps"}
+        ]'></ul>
+      </div>
+    </div>
+
+    <!-- SUNDAY: REST -->
+    <div class="day-card" style="opacity:0.38;pointer-events:none;">
+      <div class="day-head">
+        <div style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">😴</div>
+        <div class="day-info">
+          <div class="day-tag">Sunday</div>
+          <div class="day-name">Full Rest</div>
+          <div class="day-focus" style="color:var(--muted)">Mandatory Recovery</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /days -->
+</section>
+
+<hr>
+
+<!-- SECTION: NUTRITION -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <span class="sec-title">Nutrition</span>
+  </div>
+  <div class="tbl-box">
+    <h3>Daily Macro Targets</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Maintenance ~2,400 kcal. Target ~1,900 kcal/day for steady fat loss.</p>
+    <table>
+      <thead><tr><th>Macro</th><th>Daily</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Protein</td><td><span class="hl">140–160g</span></td><td style="color:var(--muted)">Preserves muscle, keeps you full</td></tr>
+        <tr><td>Carbs</td><td><span class="hl">160–180g</span></td><td style="color:var(--muted)">Fuel for workouts. Rice, oats, veg</td></tr>
+        <tr><td>Fats</td><td><span class="hl">50–60g</span></td><td style="color:var(--muted)">Critical for testosterone</td></tr>
+        <tr><td>Water</td><td><span class="hl">3–4 litres</span></td><td style="color:var(--muted)">Bangladesh heat — stay hydrated</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="info-grid">
+    <div class="info-card">
+      <span class="ico">🍳</span><h3>Best Proteins</h3>
+      <ul>
+        <li>Eggs (5–6 daily)</li>
+        <li>Hilsa, Rohu, Catla fish</li>
+        <li>Chicken breast</li>
+        <li>Daal + rice combo</li>
+        <li>Doi / Greek yogurt</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <span class="ico">🚫</span><h3>Avoid</h3>
+      <ul>
+        <li>Cola & sweetened drinks</li>
+        <li>Fried snacks</li>
+        <li>Daily mishti/sweets</li>
+        <li>Heavy rice at dinner</li>
+        <li>Late-night eating</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <span class="ico">⚡</span><h3>Pre / Post</h3>
+      <ul>
+        <li>Pre: banana + black coffee 30 min before</li>
+        <li>Post: eggs + rice within 1 hour</li>
+        <li>Don't train fully fasted</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- SECTION: TESTOSTERONE -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <span class="sec-title">Boost Testosterone</span>
+  </div>
+  <div class="info-grid">
+    <div class="info-card"><span class="ico">🏋️</span><h3>Train Heavy</h3><p>Squats, deadlifts, bench press trigger the biggest T response. Compound lifts beat cardio for hormones.</p></div>
+    <div class="info-card"><span class="ico">😴</span><h3>Sleep 7–8h</h3><p>70% of testosterone is made during sleep. Even one week at 5–6h drops T by 15%. Non-negotiable.</p></div>
+    <div class="info-card"><span class="ico">☀️</span><h3>Morning Sun</h3><p>20–30 min daily. Vitamin D deficiency directly linked to low T. Free and powerful in Bangladesh.</p></div>
+    <div class="info-card"><span class="ico">🧘</span><h3>Manage Stress</h3><p>Cortisol suppresses testosterone. Rest days are when your hormones recover — don't skip them.</p></div>
+  </div>
+</section>
+
+<div class="footer">
+  <em>DISCIPLINE TODAY · STRENGTH TOMORROW</em><br>
+  <span style="margin-top:6px;display:block;">CONSISTENCY > PERFECTION</span>
+</div>
+</div><!-- /wrap -->
+
 <div class="toast" id="toast"></div>
 
 <script>
-  const DAYS = ['mon','tue','wed','thu','fri','sat'];
-  const WORKOUT_DAYS = ['mon','tue','wed','fri','sat']; // thu is rest, tracked separately
-  const MESSAGES = [
-    'Session logged! 💪',
-    'Get it! 🔥',
-    'One step closer to 68kg! ✅',
-    'Beast mode activated 🏋️',
-    'That\'s progress! 🎯'
+const WORKOUT_DAYS = ['mon','tue','thu','fri','sat'];
+
+const TOASTS_DONE  = ['Day complete! 🔥','Session locked in! 💪','That\'s a W! ✅','Beast mode! 🏋️','Crushed it! 🎯'];
+const TOASTS_EX    = ['✓ Done!','Keep going!','Nailed it!','One less! 💪'];
+const TOASTS_UNDO  = ['Unmarked.','Taking it back? 😄'];
+
+function getState(){
+  try{return JSON.parse(localStorage.getItem('gymV4')||'{}');}
+  catch{return {};}
+}
+function saveState(s){localStorage.setItem('gymV4',JSON.stringify(s));}
+
+/* ── Build exercise lists ── */
+function initExercises(){
+  WORKOUT_DAYS.forEach(day=>{
+    const ul=document.getElementById('ex-'+day);
+    if(!ul)return;
+    const exs=JSON.parse(ul.dataset.exercises);
+    ul.innerHTML=exs.map((ex,i)=>`
+      <li class="ex-item" id="ex-${day}-${i}" onclick="toggleEx('${day}',${i})">
+        <div class="ex-tick">✓</div>
+        <div class="ex-text">
+          <div class="ex-name">${ex.n}</div>
+          <div class="ex-sets">${ex.s}</div>
+        </div>
+      </li>`).join('');
+  });
+}
+
+/* ── Toggle single exercise ── */
+function toggleEx(day,idx){
+  const s=getState();
+  if(!s[day])s[day]={};
+  if(!s[day].ex)s[day].ex={};
+  const wasOn=!!s[day].ex[idx];
+  s[day].ex[idx]=!wasOn;
+
+  const ul=document.getElementById('ex-'+day);
+  const total=JSON.parse(ul.dataset.exercises).length;
+  const doneCount=Object.values(s[day].ex).filter(Boolean).length;
+
+  if(doneCount===total){
+    s[day].done=true;
+    showToast(pick(TOASTS_DONE));
+  } else {
+    s[day].done=false;
+    showToast(wasOn ? pick(TOASTS_UNDO) : pick(TOASTS_EX));
+  }
+
+  saveState(s);
+  renderDay(day,s);
+  renderProgress(s);
+}
+
+/* ── Manual day toggle ── */
+function manualDay(e,day){
+  e.stopPropagation();
+  const s=getState();
+  if(!s[day])s[day]={};
+  const ul=document.getElementById('ex-'+day);
+  const total=JSON.parse(ul.dataset.exercises).length;
+  const wasDone=!!s[day].done;
+
+  if(!wasDone){
+    s[day].done=true;
+    s[day].ex={};
+    for(let i=0;i<total;i++)s[day].ex[i]=true;
+    showToast(pick(TOASTS_DONE));
+  } else {
+    s[day].done=false;
+    s[day].ex={};
+    showToast('Reset! 🔄');
+  }
+
+  saveState(s);
+  renderDay(day,s);
+  renderProgress(s);
+}
+
+/* ── Toggle open/close ── */
+function toggleOpen(day){
+  const card=document.getElementById('dc-'+day);
+  card.classList.toggle('open');
+}
+
+/* ── Render a single day ── */
+function renderDay(day,s){
+  const card=document.getElementById('dc-'+day);
+  const chk=document.getElementById('chk-'+day);
+  const cnt=document.getElementById('cnt-'+day);
+  const ul=document.getElementById('ex-'+day);
+  if(!ul)return;
+
+  const exs=JSON.parse(ul.dataset.exercises);
+  const ds=s[day]||{};
+  const exState=ds.ex||{};
+  const doneCount=Object.values(exState).filter(Boolean).length;
+  const total=exs.length;
+  const isDone=!!ds.done;
+
+  // card
+  isDone ? card.classList.add('completed') : card.classList.remove('completed');
+
+  // circle button
+  chk.classList.remove('done','partial');
+  if(isDone) chk.classList.add('done');
+  else if(doneCount>0) chk.classList.add('partial');
+
+  // counter
+  if(cnt) cnt.textContent=doneCount+'/'+total;
+
+  // exercise rows
+  exs.forEach((_,i)=>{
+    const li=document.getElementById('ex-'+day+'-'+i);
+    if(!li)return;
+    exState[i] ? li.classList.add('done-ex') : li.classList.remove('done-ex');
+  });
+}
+
+/* ── Render progress bar ── */
+function renderProgress(s){
+  const done=WORKOUT_DAYS.filter(d=>s[d]&&s[d].done).length;
+  const total=WORKOUT_DAYS.length;
+  document.getElementById('pFill').style.width=Math.round(done/total*100)+'%';
+  document.getElementById('pCount').textContent=done+' / '+total+' sessions';
+  const msgs=[
+    'Tap exercises to track 💪',
+    'Good start — keep going!',
+    'Halfway there this week! 🔥',
+    'Almost a full week — push!',
+    'Full week done! 🏆 Reset when ready.',
   ];
+  document.getElementById('pMsg').textContent=msgs[Math.min(done,msgs.length-1)];
+}
 
-  // ── State ──
-  function getState() {
-    try {
-      return JSON.parse(localStorage.getItem('gymState') || '{}');
-    } catch { return {}; }
-  }
+/* ── Reset week ── */
+function resetWeek(){
+  if(!confirm('Reset this week\'s progress?'))return;
+  saveState({});
+  renderAll({});
+  showToast('Week reset. Let\'s go! 🔄');
+}
 
-  function saveState(state) {
-    localStorage.setItem('gymState', JSON.stringify(state));
-  }
+/* ── Render all ── */
+function renderAll(s){
+  WORKOUT_DAYS.forEach(d=>renderDay(d,s));
+  renderProgress(s);
+}
 
-  // ── Toggle a day ──
-  function toggleDay(day) {
-    const state = getState();
-    state[day] = !state[day];
-    saveState(state);
-    renderAll(state);
+/* ── Toast ── */
+let toastTimer;
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2000);
+}
 
-    if (state[day]) {
-      showToast(MESSAGES[Math.floor(Math.random() * MESSAGES.length)]);
-    }
-  }
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
 
-  // ── Reset week ──
-  function resetWeek() {
-    if (!confirm('Reset this week\'s progress?')) return;
-    saveState({});
-    renderAll({});
-    showToast('Week reset. Let\'s go again! 🔄');
-  }
-
-  // ── Render ──
-  function renderAll(state) {
-    let done = 0;
-
-    DAYS.forEach(day => {
-      const card = document.getElementById('day-' + day);
-      const btn = document.getElementById('btn-' + day);
-      if (!card) return;
-
-      const isChecked = !!state[day];
-
-      if (isChecked) {
-        card.classList.add('completed');
-        if (btn) { btn.classList.add('checked'); btn.textContent = '✓'; }
-        if (WORKOUT_DAYS.includes(day)) done++;
-      } else {
-        card.classList.remove('completed');
-        if (btn) { btn.classList.remove('checked'); btn.textContent = '✓'; }
-      }
-    });
-
-    const total = WORKOUT_DAYS.length;
-    const pct = Math.round((done / total) * 100);
-
-    document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('progressCount').textContent = done + ' / ' + total + ' sessions done';
-
-    const msgs = [
-      'Mark sessions complete as you go 💪',
-      'Good start — keep going!',
-      'Halfway there this week!',
-      'Almost a full week — push through!',
-      'Full week locked in! 🏆 Reset for next week.',
-    ];
-    document.getElementById('progressMsg').textContent = msgs[Math.min(done, msgs.length - 1)];
-  }
-
-  // ── Toast ──
-  let toastTimer;
-  function showToast(msg) {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
-  }
-
-  // ── Init ──
-  renderAll(getState());
-
-  // ── Service Worker ──
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  }
+/* ── Boot ── */
+initExercises();
+renderAll(getState());
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
