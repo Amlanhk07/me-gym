@@ -320,6 +320,43 @@ tr:last-child td{border-bottom:none}
 
 .footer{text-align:center;padding:20px 0 8px;color:var(--text3);font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:2px}
 @media(max-width:380px){.stat-grid{grid-template-columns:repeat(2,1fr)}.ig{grid-template-columns:1fr 1fr}}
+
+/* ── EXERCISE MODAL ── */
+#exModal{position:fixed;inset:0;z-index:500;display:none;align-items:flex-end;justify-content:center}
+#exModal.open{display:flex}
+.em-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
+.em-sheet{position:relative;z-index:1;background:#0f1110;border:1px solid var(--border2);border-radius:20px 20px 0 0;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;padding:0 0 40px;animation:sheetUp .3s cubic-bezier(.4,0,.2,1)}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.em-handle{width:36px;height:4px;background:var(--border2);border-radius:4px;margin:12px auto 0}
+.em-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#0f1110;z-index:2}
+.em-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:2px}
+.em-sets{font-size:12px;color:var(--teal);font-weight:500}
+.em-close{position:absolute;top:14px;right:16px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.em-body{padding:16px 18px 0}
+/* images */
+.em-imgs{display:flex;gap:10px;margin-bottom:16px;min-height:140px;align-items:center;justify-content:center}
+.em-img{border-radius:10px;background:var(--bg3);border:1px solid var(--border);overflow:hidden;flex:1;max-width:160px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+.em-img img{width:100%;height:100%;object-fit:contain;padding:4px}
+/* loading skeleton */
+.em-skel{background:var(--bg3);border-radius:8px;animation:skel 1.4s infinite}
+@keyframes skel{0%,100%{opacity:.4}50%{opacity:.8}}
+.em-skel-img{height:130px;flex:1;border-radius:10px}
+/* muscles */
+.em-section{margin-bottom:14px}
+.em-sec-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:7px}
+.em-muscles{display:flex;flex-wrap:wrap;gap:6px}
+.em-muscle{background:var(--teal-dim);border:1px solid rgba(63,255,210,.2);color:var(--teal);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500}
+.em-muscle.sec{background:var(--accent-dim);border-color:rgba(200,255,87,.2);color:var(--accent)}
+/* description */
+.em-desc{font-size:13px;color:var(--text2);line-height:1.7;background:var(--bg3);border-radius:10px;padding:12px 14px}
+/* form cues */
+.em-cues{list-style:none;display:flex;flex-direction:column;gap:6px}
+.em-cue{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--text2);line-height:1.5}
+.em-cue::before{content:'→';color:var(--accent);flex-shrink:0;font-size:11px;margin-top:1px}
+/* error */
+.em-err{text-align:center;padding:32px 16px;color:var(--text3);font-size:13px}
+/* no-image placeholder */
+.em-no-img{width:100%;text-align:center;padding:20px;color:var(--text3);font-size:12px}
 </style>
 </head>
 <body>
@@ -496,6 +533,28 @@ tr:last-child td{border-bottom:none}
       <div class="footer">DISCIPLINE TODAY · STRENGTH TOMORROW</div>
     </div>
 
+  </div>
+</div>
+
+
+<!-- EXERCISE MODAL -->
+<div id="exModal">
+  <div class="em-overlay" onclick="closeExModal()"></div>
+  <div class="em-sheet" id="emSheet">
+    <div class="em-handle"></div>
+    <div class="em-header">
+      <div class="em-title" id="emTitle">Exercise</div>
+      <div class="em-sets" id="emSets"></div>
+      <button class="em-close" onclick="closeExModal()">✕</button>
+    </div>
+    <div class="em-body" id="emBody">
+      <div style="display:flex;gap:10px;margin-bottom:16px">
+        <div class="em-skel em-skel-img"></div>
+        <div class="em-skel em-skel-img"></div>
+      </div>
+      <div class="em-skel" style="height:14px;border-radius:4px;margin-bottom:8px;width:40%"></div>
+      <div class="em-skel" style="height:60px;border-radius:8px"></div>
+    </div>
   </div>
 </div>
 
@@ -704,7 +763,7 @@ function buildDayViews(){
     const exH=d.exercises.map((ex,i)=>{
       const bg=ex.b?`<span class="eb b-${ex.b}">${ex.b.toUpperCase()}</span>`:'';
       const nt=ex.note?` <em style="color:var(--teal);font-style:normal;font-size:9px">${ex.note}</em>`:'';
-      return`<li class="ex-i" id="ex-${d.id}-${i}" onclick="tgEx('${d.id}',${i})"><div class="ex-tick">&#x2713;</div><div class="ex-c"><div class="ex-n">${ex.n}</div><div class="ex-d">${ex.s}${nt}</div></div><div class="ex-r">${bg}<span class="pr-t" id="pt-${d.id}-${i}">PR</span><div class="ww" onclick="event.stopPropagation()"><input class="wi" type="number" placeholder="—" min="0" max="500" step="2.5" id="wt-${d.id}-${i}" onchange="wtCh('${d.id}',${i},this.value)" inputmode="decimal"><span class="wu2">kg</span></div></div></li>`;
+      return`<li class="ex-i" id="ex-${d.id}-${i}" onclick="tgEx('${d.id}',${i})"><div class="ex-tick">&#x2713;</div><div class="ex-c"><div class="ex-n">${ex.n}</div><div class="ex-d">${ex.s}${nt}</div></div><div class="ex-r">${bg}<span class="pr-t" id="pt-${d.id}-${i}">PR</span><button onclick="event.stopPropagation();openExModal('${ex.n.replace(/'/g,"\\'")}','${ex.s}')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:6px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;flex-shrink:0" title="View exercise guide">&#x2139;</button><div class="ww" onclick="event.stopPropagation()"><input class="wi" type="number" placeholder="—" min="0" max="500" step="2.5" id="wt-${d.id}-${i}" onchange="wtCh('${d.id}',${i},this.value)" inputmode="decimal"><span class="wu2">kg</span></div></div></li>`;
     }).join('');
     return`<div class="dv" id="dv-${d.id}">
       <div class="wu">&#x1F525; <strong style="margin-right:4px">Warm-up:</strong> 5 min treadmill + dynamic stretch</div>
@@ -1009,6 +1068,103 @@ sb.auth.onAuthStateChange(async(event,session)=>{
     showAuth();
   }
 });
+
+// ═══════════════════════════════════════
+// EXERCISE MODAL — wger API
+// ═══════════════════════════════════════
+const MUSCLE_NAMES={1:'Biceps brachii',2:'Anterior deltoid',3:'Serratus anterior',4:'Pectoralis major',5:'Triceps brachii',6:'Rectus abdominis',7:'Gastrocnemius',8:'Gluteus maximus',9:'Hamstrings',10:'Quadriceps femoris',11:'Soleus',12:'Tibialis anterior',13:'Latissimus dorsi',14:'Brachialis',15:'Obliquus externus abdominis',16:'Trapezius',17:'Erector spinae',18:'Rear deltoid',19:'Subscapularis',20:'Teres major'};
+
+const WGER_IDS={'Barbell Bench Press':192,'Incline Dumbbell Press':28,'Seated DB Shoulder Press':61,'Lateral Raises':74,'Barbell Deadlift':81,'Lat Pulldown':102,'Seated Cable Row':110,'Barbell Curl':111,'Barbell Back Squat':222,'Decline Sit-ups':91,'Plank Hold':305,'Mountain Climbers':368,'Burpees':null,'Walking Lunges':null,'Hammer Curl':null};
+
+const FORM_CUES={'Barbell Bench Press':['Lie flat, feet planted, arch lower back slightly','Grip slightly wider than shoulder width, wrists straight','Lower bar to lower chest, elbows at 45 degrees from torso','Press explosively up, do not shrug shoulders at top'],'Incline Dumbbell Press':['Set bench to 30-45 degrees, dumbbells at shoulder level','Keep chest up, squeeze shoulder blades together','Lower until elbows are slightly below bench','Press up and slightly inward, squeeze chest at top'],'Cable Chest Fly':['Stand between cables, slight forward lean','Keep a slight bend in elbows throughout','Bring hands together in a hugging arc','Squeeze chest hard at peak, control the return'],'Seated DB Shoulder Press':['Sit upright, core tight, feet flat','Start with dumbbells at ear level, palms forward','Press straight up, do not lock elbows at top','Lower slowly — 2 seconds down'],'Lateral Raises':['Stand tall, slight bend at elbows','Raise arms to shoulder height only','Lead with elbows, not wrists','Lower slowly — this is where growth happens'],'Tricep Rope Pushdown':['Elbows pinned to sides throughout','Push rope down and flare wrists out at bottom','Squeeze triceps hard at bottom','Control the return — do not let it fly up'],'Overhead DB Tricep Ext.':['Hold dumbbell overhead with both hands','Elbows pointing forward, not flaring out','Lower behind head until forearms parallel floor','Press up to full extension, squeeze triceps'],'Barbell Deadlift':['Feet hip-width, bar over mid-foot','Grip just outside legs, spine neutral throughout','Push the floor away — do not pull with your back','Hips and shoulders rise at same rate off the floor','Lock out by squeezing glutes, not hyperextending back'],'Lat Pulldown':['Grip slightly wider than shoulder width, lean back 10 degrees','Pull bar to upper chest, lead with elbows','Squeeze lats at bottom — pause 1 second','Let bar rise slowly, feel the stretch at top'],'Seated Cable Row':['Sit tall, chest up, slight arch in lower back','Pull handle to lower sternum, elbows go back','Squeeze shoulder blades together at end','Return slowly — full stretch at front is key'],'Single-Arm DB Row':['Support with opposite hand and knee on bench','Keep spine neutral, parallel to floor','Pull dumbbell to hip, elbow travels straight back','Lower slowly, get a full shoulder stretch'],'Face Pulls':['Set cable at face height, use rope attachment','Pull rope to forehead, elbows above wrists','Rotate hands outward at end — thumbs back','Controls rear delts and rotator cuff health'],'Barbell Curl':['Stand tall, elbows pinned to sides','Curl bar up without swinging torso','Squeeze biceps hard at the top','Lower over 3 seconds — the negative builds muscle'],'Hammer Curl':['Neutral grip — palms facing each other','Curl with control, no swinging','Works brachialis and forearms more than regular curl','Alternate arms or do both simultaneously'],'Barbell Back Squat':['Bar on upper traps, feet shoulder width, toes out 15-30 degrees','Big breath and brace core before descending','Knees track over toes, sit between legs','Break parallel — crease of hip below top of knee','Drive up through heels, hips and chest rise together'],'Romanian Deadlift DB':['Hold dumbbells in front, slight knee bend','Hinge at hips — push hips BACK, not down','Feel the hamstring stretch, keep back flat','Drive hips forward to return, squeeze glutes at top'],'Leg Press Machine':['Feet shoulder width, mid-plate, toes slightly out','Lower until knees reach 90 degrees — no lower','Press through whole foot, do not lock knees','Never let lower back peel off the pad'],'Leg Curl Machine':['Lie face down, pad just above ankles','Curl heels toward glutes, full range','Squeeze hamstrings at top, lower slowly','Do not let hips rise off the pad'],'Walking Lunges':['Front knee over ankle, not past toes','Back knee lowers just above the floor','Keep torso upright, core engaged','Push off front foot to step forward'],'Standing Calf Raises':['Full range: deep stretch at bottom, full rise at top','Pause 1 second at peak contraction','Go slow — calves respond to time under tension','3 sets of 15-20 reps minimum'],'Hanging Knee Raises':['Hang from bar, shoulders packed down','Bring knees to chest by curling pelvis up','Do not swing — control the movement','Lower slowly to maximize core engagement'],'Cable Crunch':['Kneel at cable, rope at back of head','Crunch DOWN toward knees, not forward','Move from the abs — do not pull with arms','Round your back — correct form here'],'Decline Sit-ups':['Anchor feet, hands lightly behind head','Curl up through full range','Do not pull neck with your hands','Lower slowly — 3 seconds down'],'Russian Twists weighted':['Sit at 45 degrees, feet slightly elevated','Rotate torso side to side, not just arms','Keep chest up, do not collapse forward','Add weight once bodyweight becomes easy'],'Plank Hold':['Forearms on floor, body straight as a board','Do not let hips sag or pike up','Breathe normally — squeeze abs and glutes','Build from 30s to 60s to 90s over weeks'],'Ab Wheel Rollout':['Start kneeling, wheel directly under shoulders','Roll forward keeping core braced — back must not arch','Go as far as you can control, then roll back','This is harder than it looks — start with small range'],'Mountain Climbers':['High plank position, hands under shoulders','Drive knees to chest alternately, stay level','Keep hips down, do not bounce them','Fast for cardio effect, slow for core strength'],'Cycling Sprint HIIT':['Resistance medium-high for sprints','30s all-out effort, 90s easy recovery × 10 rounds','Keep cadence high during sprints — above 80 RPM','Burns 200-300 extra calories post-workout (EPOC effect)'],'Burpees':['Squat down, jump feet back to plank','Do a push-up then jump feet back to hands','Explode upward, clap overhead at the top','Full extension at the top — every rep'],'DB Thrusters squat+press':['Hold dumbbells at shoulders, feet shoulder width','Squat to parallel, drive up explosively','Use the squat momentum to press overhead','One fluid movement — squat and press together'],'Plank to Push-up':['Start in forearm plank position','Push up to high plank one arm at a time','Lower back to forearm plank one arm at a time','Alternate which arm leads each rep'],'Battle Ropes / Jump Rope':['Battle rope: anchor low, stand with slight squat','Alternate waves — keep rhythm for full 30 seconds','Jump rope: light on feet, wrists do the turning','Both are excellent cardio and shoulder conditioning'],'Treadmill Incline 5 Speed 5.5':['Incline 5 increases calorie burn by ~50% vs flat','Hold steady pace, do not hold onto rails','Swing arms naturally, look forward not down','Target heart rate: 130-150 BPM for fat burn zone'],'Cross Trainer Resistance 7':['Use arm handles actively — do not just stand','Keep resistance high enough to feel challenged','Smooth circular motion, do not bounce','Great low-impact cardio — burns similar to running']};
+
+let exModalOpen=false;
+
+async function openExModal(exName, exSets) {
+  const modal=document.getElementById('exModal');
+  const title=document.getElementById('emTitle');
+  const sets=document.getElementById('emSets');
+  const body=document.getElementById('emBody');
+  title.textContent=exName;
+  sets.textContent=exSets||'';
+  body.innerHTML='<div style="display:flex;gap:10px;margin-bottom:16px"><div class="em-skel em-skel-img"></div><div class="em-skel em-skel-img"></div></div><div class="em-skel" style="height:12px;border-radius:4px;margin-bottom:6px;width:35%"></div><div class="em-skel" style="height:14px;border-radius:4px;margin-bottom:14px;width:55%"></div><div class="em-skel" style="height:70px;border-radius:8px"></div>';
+  modal.classList.add('open');
+  exModalOpen=true;
+  document.body.style.overflow='hidden';
+  try {
+    const data=await fetchWgerExercise(exName);
+    renderExModal(exName,exSets,data);
+  } catch(e) {
+    console.warn('wger fetch error:',e);
+    renderExModal(exName,exSets,null);
+  }
+}
+
+async function fetchWgerExercise(exName) {
+  const hid=WGER_IDS[exName];
+  if(hid){
+    try{
+      const r=await fetch('https://wger.de/api/v2/exerciseinfo/'+hid+'/?format=json');
+      if(r.ok)return await r.json();
+    }catch(e){}
+  }
+  try{
+    const term=encodeURIComponent(exName.split(' ').slice(0,3).join(' '));
+    const r=await fetch('https://wger.de/api/v2/exercise/search/?term='+term+'&language=english&format=json');
+    if(r.ok){
+      const sd=await r.json();
+      const suggestions=sd.suggestions||[];
+      if(suggestions.length>0){
+        const id=suggestions[0].data?.id||suggestions[0].id;
+        if(id){
+          const r2=await fetch('https://wger.de/api/v2/exerciseinfo/'+id+'/?format=json');
+          if(r2.ok)return await r2.json();
+        }
+      }
+    }
+  }catch(e){}
+  return null;
+}
+
+function renderExModal(exName,exSets,data) {
+  const body=document.getElementById('emBody');
+  const cues=FORM_CUES[exName]||[];
+  let imgsHTML='',musclesHTML='',descHTML='';
+  if(data){
+    const imgs=(data.images||[]).slice(0,2);
+    if(imgs.length){
+      imgsHTML='<div class="em-imgs">'+imgs.map(img=>'<div class="em-img"><img src="'+img.image+'" alt="'+exName+'" loading="lazy" onerror="this.parentElement.style.display='none'"></div>').join('')+'</div>';
+    }else{
+      imgsHTML='<div class="em-imgs"><div class="em-no-img">No images in database for this exercise</div></div>';
+    }
+    const primary=(data.muscles||[]).map(m=>MUSCLE_NAMES[m.id]||m.name_en||m.name||'');
+    const secondary=(data.muscles_secondary||[]).map(m=>MUSCLE_NAMES[m.id]||m.name_en||m.name||'');
+    if(primary.length||secondary.length){
+      musclesHTML='<div class="em-section"><div class="em-sec-lbl">Muscles Worked</div><div class="em-muscles">'+primary.map(m=>'<span class="em-muscle">'+m+'</span>').join('')+secondary.map(m=>'<span class="em-muscle sec">'+m+' (secondary)</span>').join('')+'</div></div>';
+    }
+    const translations=data.translations||[];
+    const eng=translations.find(t=>t.language===2);
+    const rawDesc=(eng?.description||'').replace(/<[^>]*>/g,'').trim();
+    if(rawDesc&&rawDesc.length>10){
+      descHTML='<div class="em-section"><div class="em-sec-lbl">About</div><div class="em-desc">'+rawDesc.slice(0,400)+(rawDesc.length>400?'...':'')+'</div></div>';
+    }
+  }else{
+    imgsHTML='<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px;margin-bottom:12px">Could not load images — check internet connection</div>';
+  }
+  const cuesHTML=cues.length?'<div class="em-section"><div class="em-sec-lbl">Form Cues</div><ul class="em-cues">'+cues.map(c=>'<li class="em-cue">'+c+'</li>').join('')+'</ul></div>':'';
+  body.innerHTML=imgsHTML+musclesHTML+descHTML+cuesHTML;
+}
+
+function closeExModal() {
+  document.getElementById('exModal').classList.remove('open');
+  exModalOpen=false;
+  document.body.style.overflow='';
+}
+
+let touchStartY=0;
+document.addEventListener('touchstart',e=>{if(exModalOpen)touchStartY=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchend',e=>{if(exModalOpen&&e.changedTouches[0].clientY-touchStartY>80)closeExModal();},{passive:true});
+
 
 init();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
