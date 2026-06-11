@@ -344,39 +344,52 @@ tr:last-child td{border-bottom:none}
 /* ── EXERCISE MODAL ── */
 #exModal{position:fixed;inset:0;z-index:500;display:none;align-items:flex-end;justify-content:center}
 #exModal.open{display:flex}
-.em-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
-.em-sheet{position:relative;z-index:1;background:#0f1110;border:1px solid var(--border2);border-radius:20px 20px 0 0;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;padding:0 0 40px;animation:sheetUp .3s cubic-bezier(.4,0,.2,1)}
+.em-overlay{position:absolute;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px)}
+.em-sheet{position:relative;z-index:1;background:#0c0f0d;border:1px solid var(--border2);border-radius:22px 22px 0 0;width:100%;max-width:700px;max-height:92vh;overflow-y:auto;padding:0 0 48px;animation:sheetUp .32s cubic-bezier(.4,0,.2,1)}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.em-handle{width:36px;height:4px;background:var(--border2);border-radius:4px;margin:12px auto 0}
-.em-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#0f1110;z-index:2}
-.em-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:2px}
-.em-sets{font-size:12px;color:var(--teal);font-weight:500}
-.em-close{position:absolute;top:14px;right:16px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
-.em-body{padding:16px 18px 0}
-/* images */
-.em-imgs{display:flex;gap:10px;margin-bottom:16px;min-height:140px;align-items:center;justify-content:center}
-.em-img{border-radius:10px;background:var(--bg3);border:1px solid var(--border);overflow:hidden;flex:1;max-width:160px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
-.em-img img{width:100%;height:100%;object-fit:contain;padding:4px}
+.em-handle{width:40px;height:4px;background:var(--border2);border-radius:4px;margin:14px auto 0}
+.em-header{padding:14px 18px 13px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#0c0f0d;z-index:2;display:flex;align-items:flex-start;gap:10px}
+.em-hinfo{flex:1;min-width:0}
+.em-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;line-height:1.1}
+.em-sets{font-size:11px;color:var(--teal);font-weight:600;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;margin-top:2px}
+.em-close{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+/* GIF area */
+.em-gif-wrap{width:100%;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;gap:0;overflow:hidden;position:relative;min-height:210px;align-items:center;justify-content:center}
+.em-gif-pair{display:flex;width:100%;height:220px}
+.em-gif-frame{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.em-gif-frame+.em-gif-frame{border-left:1px solid var(--border)}
+.em-gif-frame img{width:100%;height:100%;object-fit:contain;padding:6px}
+.em-gif-label{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);backdrop-filter:blur(4px);color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;border-radius:20px;padding:2px 8px;white-space:nowrap}
+.em-gif-none{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text3);font-size:12px;width:100%;min-height:150px}
+.em-gif-none-icon{font-size:32px;opacity:.3}
+/* tabs */
+.em-tabs{display:flex;border-bottom:1px solid var(--border);background:#0c0f0d;position:sticky;top:56px;z-index:2}
+.em-tab{flex:1;padding:10px 4px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.8px;font-family:'JetBrains Mono',monospace;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;transition:all .18s;text-transform:uppercase;user-select:none}
+.em-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.em-panes{padding:16px 18px 0}
+.em-pane{display:none}
+.em-pane.active{display:block}
 /* loading skeleton */
 .em-skel{background:var(--bg3);border-radius:8px;animation:skel 1.4s infinite}
 @keyframes skel{0%,100%{opacity:.4}50%{opacity:.8}}
-.em-skel-img{height:130px;flex:1;border-radius:10px}
+.em-skel-gif{height:220px;width:100%;border-radius:0}
+/* form steps */
+.em-steps{display:flex;flex-direction:column;gap:10px}
+.em-step{display:flex;gap:12px;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 13px;transition:border-color .2s}
+.em-step:hover{border-color:rgba(200,255,87,.2)}
+.em-step-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--bg);font-family:'Bebas Neue',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.em-step-text{font-size:13px;color:var(--text);line-height:1.55;padding-top:2px}
+.em-no-cues{text-align:center;padding:28px 16px;color:var(--text3);font-size:12px}
 /* muscles */
-.em-section{margin-bottom:14px}
-.em-sec-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:7px}
+.em-muscle-wrap{display:flex;flex-direction:column;gap:10px}
+.em-muscle-group{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 13px}
+.em-muscle-group-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:8px}
 .em-muscles{display:flex;flex-wrap:wrap;gap:6px}
-.em-muscle{background:var(--teal-dim);border:1px solid rgba(63,255,210,.2);color:var(--teal);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500}
+.em-muscle{background:var(--teal-dim);border:1px solid rgba(63,255,210,.2);color:var(--teal);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:500}
 .em-muscle.sec{background:var(--accent-dim);border-color:rgba(200,255,87,.2);color:var(--accent)}
 /* description */
-.em-desc{font-size:13px;color:var(--text2);line-height:1.7;background:var(--bg3);border-radius:10px;padding:12px 14px}
-/* form cues */
-.em-cues{list-style:none;display:flex;flex-direction:column;gap:6px}
-.em-cue{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--text2);line-height:1.5}
-.em-cue::before{content:'→';color:var(--accent);flex-shrink:0;font-size:11px;margin-top:1px}
-/* error */
-.em-err{text-align:center;padding:32px 16px;color:var(--text3);font-size:13px}
-/* no-image placeholder */
-.em-no-img{width:100%;text-align:center;padding:20px;color:var(--text3);font-size:12px}
+.em-desc{font-size:13px;color:var(--text2);line-height:1.75;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-top:10px}
+.em-no-data{text-align:center;padding:28px 16px;color:var(--text3);font-size:12px}
 </style>
 </head>
 <body>
@@ -569,17 +582,28 @@ tr:last-child td{border-bottom:none}
   <div class="em-sheet" id="emSheet">
     <div class="em-handle"></div>
     <div class="em-header">
-      <div class="em-title" id="emTitle">Exercise</div>
-      <div class="em-sets" id="emSets"></div>
+      <div class="em-hinfo">
+        <div class="em-title" id="emTitle">Exercise</div>
+        <div class="em-sets" id="emSets"></div>
+      </div>
       <button class="em-close" onclick="closeExModal()">✕</button>
     </div>
-    <div class="em-body" id="emBody">
-      <div style="display:flex;gap:10px;margin-bottom:16px">
-        <div class="em-skel em-skel-img"></div>
-        <div class="em-skel em-skel-img"></div>
+    <div id="emGif" class="em-gif-wrap">
+      <div class="em-skel em-skel-gif"></div>
+    </div>
+    <div class="em-tabs" id="emTabs">
+      <div class="em-tab active" onclick="switchEmTab('form')">FORM GUIDE</div>
+      <div class="em-tab" onclick="switchEmTab('muscles')">MUSCLES</div>
+      <div class="em-tab" onclick="switchEmTab('about')">ABOUT</div>
+    </div>
+    <div class="em-panes" id="emBody">
+      <div class="em-pane active" id="empForm">
+        <div class="em-skel" style="height:70px;border-radius:12px;margin-bottom:10px"></div>
+        <div class="em-skel" style="height:70px;border-radius:12px;margin-bottom:10px"></div>
+        <div class="em-skel" style="height:70px;border-radius:12px"></div>
       </div>
-      <div class="em-skel" style="height:14px;border-radius:4px;margin-bottom:8px;width:40%"></div>
-      <div class="em-skel" style="height:60px;border-radius:8px"></div>
+      <div class="em-pane" id="empMuscles"></div>
+      <div class="em-pane" id="empAbout"></div>
     </div>
   </div>
 </div>
@@ -1137,20 +1161,46 @@ sb.auth.onAuthStateChange(async(event,session)=>{
 // ═══════════════════════════════════════
 const MUSCLE_NAMES={1:'Biceps brachii',2:'Anterior deltoid',3:'Serratus anterior',4:'Pectoralis major',5:'Triceps brachii',6:'Rectus abdominis',7:'Gastrocnemius',8:'Gluteus maximus',9:'Hamstrings',10:'Quadriceps femoris',11:'Soleus',12:'Tibialis anterior',13:'Latissimus dorsi',14:'Brachialis',15:'Obliquus externus abdominis',16:'Trapezius',17:'Erector spinae',18:'Rear deltoid',19:'Subscapularis',20:'Teres major'};
 
-const WGER_IDS={'Barbell Bench Press':192,'Incline Dumbbell Press':28,'Seated DB Shoulder Press':61,'Lateral Raises':74,'Barbell Deadlift':81,'Lat Pulldown':102,'Seated Cable Row':110,'Barbell Curl':111,'Barbell Back Squat':222,'Decline Sit-ups':91,'Plank Hold':305,'Mountain Climbers':368,'Burpees':null,'Walking Lunges':null,'Hammer Curl':null};
+const WGER_IDS={
+  'Barbell Bench Press':192,'Incline Dumbbell Press':28,'Cable Chest Fly':220,
+  'Seated DB Shoulder Press':61,'Lateral Raises':74,
+  'Tricep Rope Pushdown':85,'Overhead DB Tricep Ext.':31,
+  'Barbell Deadlift':81,'Lat Pulldown':102,'Seated Cable Row':110,
+  'Single-Arm DB Row':24,'Barbell Curl':111,'Hammer Curl':113,
+  'Barbell Back Squat':222,'Romanian Deadlift DB':79,
+  'Leg Press Machine':45,'Leg Curl Machine':116,'Walking Lunges':99,
+  'Standing Calf Raises':71,'Hanging Knee Raises':15,
+  'Cable Crunch':89,'Decline Sit-ups':91,'Russian Twists weighted':104,
+  'Plank Hold':305,'Ab Wheel Rollout':303,'Mountain Climbers':368,'Burpees':9,
+  'DB Thrusters squat+press':null,'Face Pulls':326,
+};
 
 const FORM_CUES={'Barbell Bench Press':['Lie flat, feet planted, arch lower back slightly','Grip slightly wider than shoulder width, wrists straight','Lower bar to lower chest, elbows at 45 degrees from torso','Press explosively up, do not shrug shoulders at top'],'Incline Dumbbell Press':['Set bench to 30-45 degrees, dumbbells at shoulder level','Keep chest up, squeeze shoulder blades together','Lower until elbows are slightly below bench','Press up and slightly inward, squeeze chest at top'],'Cable Chest Fly':['Stand between cables, slight forward lean','Keep a slight bend in elbows throughout','Bring hands together in a hugging arc','Squeeze chest hard at peak, control the return'],'Seated DB Shoulder Press':['Sit upright, core tight, feet flat','Start with dumbbells at ear level, palms forward','Press straight up, do not lock elbows at top','Lower slowly — 2 seconds down'],'Lateral Raises':['Stand tall, slight bend at elbows','Raise arms to shoulder height only','Lead with elbows, not wrists','Lower slowly — this is where growth happens'],'Tricep Rope Pushdown':['Elbows pinned to sides throughout','Push rope down and flare wrists out at bottom','Squeeze triceps hard at bottom','Control the return — do not let it fly up'],'Overhead DB Tricep Ext.':['Hold dumbbell overhead with both hands','Elbows pointing forward, not flaring out','Lower behind head until forearms parallel floor','Press up to full extension, squeeze triceps'],'Barbell Deadlift':['Feet hip-width, bar over mid-foot','Grip just outside legs, spine neutral throughout','Push the floor away — do not pull with your back','Hips and shoulders rise at same rate off the floor','Lock out by squeezing glutes, not hyperextending back'],'Lat Pulldown':['Grip slightly wider than shoulder width, lean back 10 degrees','Pull bar to upper chest, lead with elbows','Squeeze lats at bottom — pause 1 second','Let bar rise slowly, feel the stretch at top'],'Seated Cable Row':['Sit tall, chest up, slight arch in lower back','Pull handle to lower sternum, elbows go back','Squeeze shoulder blades together at end','Return slowly — full stretch at front is key'],'Single-Arm DB Row':['Support with opposite hand and knee on bench','Keep spine neutral, parallel to floor','Pull dumbbell to hip, elbow travels straight back','Lower slowly, get a full shoulder stretch'],'Face Pulls':['Set cable at face height, use rope attachment','Pull rope to forehead, elbows above wrists','Rotate hands outward at end — thumbs back','Controls rear delts and rotator cuff health'],'Barbell Curl':['Stand tall, elbows pinned to sides','Curl bar up without swinging torso','Squeeze biceps hard at the top','Lower over 3 seconds — the negative builds muscle'],'Hammer Curl':['Neutral grip — palms facing each other','Curl with control, no swinging','Works brachialis and forearms more than regular curl','Alternate arms or do both simultaneously'],'Barbell Back Squat':['Bar on upper traps, feet shoulder width, toes out 15-30 degrees','Big breath and brace core before descending','Knees track over toes, sit between legs','Break parallel — crease of hip below top of knee','Drive up through heels, hips and chest rise together'],'Romanian Deadlift DB':['Hold dumbbells in front, slight knee bend','Hinge at hips — push hips BACK, not down','Feel the hamstring stretch, keep back flat','Drive hips forward to return, squeeze glutes at top'],'Leg Press Machine':['Feet shoulder width, mid-plate, toes slightly out','Lower until knees reach 90 degrees — no lower','Press through whole foot, do not lock knees','Never let lower back peel off the pad'],'Leg Curl Machine':['Lie face down, pad just above ankles','Curl heels toward glutes, full range','Squeeze hamstrings at top, lower slowly','Do not let hips rise off the pad'],'Walking Lunges':['Front knee over ankle, not past toes','Back knee lowers just above the floor','Keep torso upright, core engaged','Push off front foot to step forward'],'Standing Calf Raises':['Full range: deep stretch at bottom, full rise at top','Pause 1 second at peak contraction','Go slow — calves respond to time under tension','3 sets of 15-20 reps minimum'],'Hanging Knee Raises':['Hang from bar, shoulders packed down','Bring knees to chest by curling pelvis up','Do not swing — control the movement','Lower slowly to maximize core engagement'],'Cable Crunch':['Kneel at cable, rope at back of head','Crunch DOWN toward knees, not forward','Move from the abs — do not pull with arms','Round your back — correct form here'],'Decline Sit-ups':['Anchor feet, hands lightly behind head','Curl up through full range','Do not pull neck with your hands','Lower slowly — 3 seconds down'],'Russian Twists weighted':['Sit at 45 degrees, feet slightly elevated','Rotate torso side to side, not just arms','Keep chest up, do not collapse forward','Add weight once bodyweight becomes easy'],'Plank Hold':['Forearms on floor, body straight as a board','Do not let hips sag or pike up','Breathe normally — squeeze abs and glutes','Build from 30s to 60s to 90s over weeks'],'Ab Wheel Rollout':['Start kneeling, wheel directly under shoulders','Roll forward keeping core braced — back must not arch','Go as far as you can control, then roll back','This is harder than it looks — start with small range'],'Mountain Climbers':['High plank position, hands under shoulders','Drive knees to chest alternately, stay level','Keep hips down, do not bounce them','Fast for cardio effect, slow for core strength'],'Cycling Sprint HIIT':['Resistance medium-high for sprints','30s all-out effort, 90s easy recovery × 10 rounds','Keep cadence high during sprints — above 80 RPM','Burns 200-300 extra calories post-workout (EPOC effect)'],'Burpees':['Squat down, jump feet back to plank','Do a push-up then jump feet back to hands','Explode upward, clap overhead at the top','Full extension at the top — every rep'],'DB Thrusters squat+press':['Hold dumbbells at shoulders, feet shoulder width','Squat to parallel, drive up explosively','Use the squat momentum to press overhead','One fluid movement — squat and press together'],'Plank to Push-up':['Start in forearm plank position','Push up to high plank one arm at a time','Lower back to forearm plank one arm at a time','Alternate which arm leads each rep'],'Battle Ropes / Jump Rope':['Battle rope: anchor low, stand with slight squat','Alternate waves — keep rhythm for full 30 seconds','Jump rope: light on feet, wrists do the turning','Both are excellent cardio and shoulder conditioning'],'Treadmill Incline 5 Speed 5.5':['Incline 5 increases calorie burn by ~50% vs flat','Hold steady pace, do not hold onto rails','Swing arms naturally, look forward not down','Target heart rate: 130-150 BPM for fat burn zone'],'Cross Trainer Resistance 7':['Use arm handles actively — do not just stand','Keep resistance high enough to feel challenged','Smooth circular motion, do not bounce','Great low-impact cardio — burns similar to running']};
 
 let exModalOpen=false;
 
+function switchEmTab(name){
+  document.querySelectorAll('.em-tab').forEach((t,i)=>{
+    const names=['form','muscles','about'];
+    t.classList.toggle('active',names[i]===name);
+  });
+  document.querySelectorAll('.em-pane').forEach(p=>p.classList.remove('active'));
+  const pane=document.getElementById('emp'+name.charAt(0).toUpperCase()+name.slice(1));
+  if(pane)pane.classList.add('active');
+  // Scroll tab into view on the sheet
+  document.getElementById('emSheet').scrollTo({top:0,behavior:'smooth'});
+}
+
 async function openExModal(exName, exSets) {
   const modal=document.getElementById('exModal');
-  const title=document.getElementById('emTitle');
-  const sets=document.getElementById('emSets');
-  const body=document.getElementById('emBody');
-  title.textContent=exName;
-  sets.textContent=exSets||'';
-  body.innerHTML='<div style="display:flex;gap:10px;margin-bottom:16px"><div class="em-skel em-skel-img"></div><div class="em-skel em-skel-img"></div></div><div class="em-skel" style="height:12px;border-radius:4px;margin-bottom:6px;width:35%"></div><div class="em-skel" style="height:14px;border-radius:4px;margin-bottom:14px;width:55%"></div><div class="em-skel" style="height:70px;border-radius:8px"></div>';
+  document.getElementById('emTitle').textContent=exName;
+  document.getElementById('emSets').textContent=exSets?'TARGET: '+exSets:'';
+  // Reset to loading state
+  document.getElementById('emGif').innerHTML='<div class="em-skel em-skel-gif"></div>';
+  document.getElementById('empForm').innerHTML='<div class="em-skel" style="height:72px;border-radius:12px;margin-bottom:10px"></div><div class="em-skel" style="height:72px;border-radius:12px;margin-bottom:10px"></div><div class="em-skel" style="height:72px;border-radius:12px"></div>';
+  document.getElementById('empMuscles').innerHTML='';
+  document.getElementById('empAbout').innerHTML='';
+  switchEmTab('form');
   modal.classList.add('open');
   exModalOpen=true;
   document.body.style.overflow='hidden';
@@ -1190,32 +1240,88 @@ async function fetchWgerExercise(exName) {
 }
 
 function renderExModal(exName,exSets,data) {
-  const body=document.getElementById('emBody');
   const cues=FORM_CUES[exName]||[];
-  let imgsHTML='',musclesHTML='',descHTML='';
-  if(data){
-    const imgs=(data.images||[]).slice(0,2);
-    if(imgs.length){
-      imgsHTML='<div class="em-imgs">'+imgs.map(img=>'<div class="em-img"><img src="'+img.image+'" alt="'+exName+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></div>').join('')+'</div>';
+
+  // ── GIF panel ──
+  const gifWrap=document.getElementById('emGif');
+  if(data&&(data.images||[]).length){
+    const imgs=data.images.slice(0,2);
+    const labels=['START','END'];
+    if(imgs.length===1){
+      gifWrap.innerHTML=
+        '<div class="em-gif-pair">'+
+          '<div class="em-gif-frame" style="max-width:100%">'+
+            '<img src="'+imgs[0].image+'" alt="'+exName+'" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=em-gif-none><div class=em-gif-none-icon>🏋️</div>No animation available</div>\'">'+
+            '<span class="em-gif-label">ANIMATION</span>'+
+          '</div>'+
+        '</div>';
     }else{
-      imgsHTML='<div class="em-imgs"><div class="em-no-img">No images in database for this exercise</div></div>';
+      gifWrap.innerHTML='<div class="em-gif-pair">'+
+        imgs.map((img,i)=>
+          '<div class="em-gif-frame">'+
+            '<img src="'+img.image+'" alt="'+exName+' '+labels[i]+'" loading="lazy" onerror="this.parentElement.innerHTML=\'\'">'+
+            '<span class="em-gif-label">'+labels[i]+'</span>'+
+          '</div>'
+        ).join('')+
+      '</div>';
     }
-    const primary=(data.muscles||[]).map(m=>MUSCLE_NAMES[m.id]||m.name_en||m.name||'');
-    const secondary=(data.muscles_secondary||[]).map(m=>MUSCLE_NAMES[m.id]||m.name_en||m.name||'');
-    if(primary.length||secondary.length){
-      musclesHTML='<div class="em-section"><div class="em-sec-lbl">Muscles Worked</div><div class="em-muscles">'+primary.map(m=>'<span class="em-muscle">'+m+'</span>').join('')+secondary.map(m=>'<span class="em-muscle sec">'+m+' (secondary)</span>').join('')+'</div></div>';
+  }else{
+    gifWrap.innerHTML='<div class="em-gif-none"><div class="em-gif-none-icon">🏋️</div><span>'+(data?'No animation in database for this exercise':'Could not reach wger.de — check connection')+'</span></div>';
+  }
+
+  // ── FORM GUIDE tab ──
+  const formPane=document.getElementById('empForm');
+  if(cues.length){
+    formPane.innerHTML='<div class="em-steps">'+
+      cues.map((c,i)=>
+        '<div class="em-step">'+
+          '<div class="em-step-num">'+(i+1)+'</div>'+
+          '<div class="em-step-text">'+c+'</div>'+
+        '</div>'
+      ).join('')+
+    '</div>';
+  }else{
+    formPane.innerHTML='<div class="em-no-cues">No form guide available for this exercise yet.</div>';
+  }
+
+  // ── MUSCLES tab ──
+  const musclesPane=document.getElementById('empMuscles');
+  if(data){
+    const primary=(data.muscles||[]).map(m=>MUSCLE_NAMES[m.id]||m.name_en||m.name||'').filter(Boolean);
+    const secondary=(data.muscles_secondary||[]).map(m=>MUSCLE_NAMES[m.id]||m.name_en||m.name||'').filter(Boolean);
+    let html='<div class="em-muscle-wrap">';
+    if(primary.length){
+      html+='<div class="em-muscle-group"><div class="em-muscle-group-lbl">Primary Muscles</div><div class="em-muscles">'+
+        primary.map(m=>'<span class="em-muscle">'+m+'</span>').join('')+
+      '</div></div>';
     }
+    if(secondary.length){
+      html+='<div class="em-muscle-group"><div class="em-muscle-group-lbl">Secondary / Supporting</div><div class="em-muscles">'+
+        secondary.map(m=>'<span class="em-muscle sec">'+m+'</span>').join('')+
+      '</div></div>';
+    }
+    if(!primary.length&&!secondary.length){
+      html+='<div class="em-no-data">No muscle data available from wger for this exercise.</div>';
+    }
+    musclesPane.innerHTML=html+'</div>';
+  }else{
+    musclesPane.innerHTML='<div class="em-no-data">Muscle data unavailable — could not connect to wger.de.</div>';
+  }
+
+  // ── ABOUT tab ──
+  const aboutPane=document.getElementById('empAbout');
+  if(data){
     const translations=data.translations||[];
     const eng=translations.find(t=>t.language===2);
     const rawDesc=(eng?.description||'').replace(/<[^>]*>/g,'').trim();
     if(rawDesc&&rawDesc.length>10){
-      descHTML='<div class="em-section"><div class="em-sec-lbl">About</div><div class="em-desc">'+rawDesc.slice(0,400)+(rawDesc.length>400?'...':'')+'</div></div>';
+      aboutPane.innerHTML='<div class="em-desc">'+rawDesc.slice(0,600)+(rawDesc.length>600?'…':'')+'</div>';
+    }else{
+      aboutPane.innerHTML='<div class="em-no-data">No description available for this exercise in wger.</div>';
     }
   }else{
-    imgsHTML='<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px;margin-bottom:12px">Could not load images — check internet connection</div>';
+    aboutPane.innerHTML='<div class="em-no-data">Description unavailable — could not connect to wger.de.</div>';
   }
-  const cuesHTML=cues.length?'<div class="em-section"><div class="em-sec-lbl">Form Cues</div><ul class="em-cues">'+cues.map(c=>'<li class="em-cue">'+c+'</li>').join('')+'</ul></div>':'';
-  body.innerHTML=imgsHTML+musclesHTML+descHTML+cuesHTML;
 }
 
 function closeExModal() {
