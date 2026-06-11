@@ -630,7 +630,7 @@ async function init(){
   document.getElementById('wld').value=new Date().toISOString().split('T')[0];
   calY=new Date().getFullYear();calM=new Date().getMonth();
 
-  // Kill and re-register service worker to bust stale cache
+  // Unregister old service workers to bust stale cache
   if('serviceWorker' in navigator){
     try{
       const regs=await navigator.serviceWorker.getRegistrations();
@@ -638,41 +638,28 @@ async function init(){
     }catch(e){}
   }
 
-  const loaderSub=document.getElementById('loaderSub');
-  const loaderFill=document.querySelector('.loader-bar-fill');
+  // INSTANT: hide loader, show auth screen immediately — no waiting
+  document.getElementById('loader').style.display='none';
+  document.getElementById('authScreen').style.display='flex';
 
-  function setLoaderProgress(pct,msg){
-    if(loaderFill)loaderFill.style.width=pct+'%';
-    if(loaderSub)loaderSub.textContent=msg;
-  }
-
-  setLoaderProgress(20,'CONNECTING...');
-
-  // Hard timeout — if anything hangs, show auth after 5s
-  const hardTimeout=setTimeout(()=>{
-    console.warn('Hard timeout fired — forcing auth screen');
-    showAuth();
-  },5000);
-
+  // BACKGROUND: quietly check if user is already logged in
+  // If yes, swap to app without them needing to log in again
   try{
-    setLoaderProgress(40,'CHECKING SESSION...');
-    // Race getSession against a 4s timeout
     const sessionResult=await Promise.race([
       sb.auth.getSession(),
-      new Promise((_,r)=>setTimeout(()=>r(new Error('session_timeout')),4000))
+      new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),5000))
     ]);
-    clearTimeout(hardTimeout);
-    setLoaderProgress(70,'LOADING...');
     if(sessionResult?.data?.session){
       CU=sessionResult.data.session.user;
+      document.getElementById('authScreen').style.display='none';
+      document.getElementById('loader').style.display='flex';
+      document.querySelector('.loader-bar-fill').style.width='60%';
+      document.getElementById('loaderSub').textContent='LOADING YOUR DATA...';
       await afterLogin();
-    }else{
-      showAuth();
     }
   }catch(e){
-    clearTimeout(hardTimeout);
-    console.warn('Session check failed:',e.message);
-    showAuth();
+    // Session check failed — user stays on auth screen, no problem
+    console.warn('Background session check failed:',e.message);
   }
 }
 
