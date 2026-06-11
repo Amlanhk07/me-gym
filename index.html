@@ -35,7 +35,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .loader-logo{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:3px;color:var(--accent)}
 .loader-sub{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:2px}
 .loader-bar{width:160px;height:3px;background:var(--border2);border-radius:3px;overflow:hidden;margin-top:8px}
-.loader-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));width:0%;animation:loadfill 1.4s ease forwards}
+.loader-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));width:0%;transition:width .3s ease}
 @keyframes loadfill{to{width:100%}}
 
 /* AUTH */
@@ -363,7 +363,7 @@ tr:last-child td{border-bottom:none}
 
 <div class="loader" id="loader">
   <div class="loader-logo">MY GYM</div>
-  <div class="loader-sub">LOADING YOUR DATA...</div>
+  <div class="loader-sub" id="loaderSub">CONNECTING...</div>
   <div class="loader-bar"><div class="loader-bar-fill"></div></div>
 </div>
 
@@ -629,20 +629,49 @@ let calY,calM,aLift=null,wChart=null,sChart=null,lChart=null;
 async function init(){
   document.getElementById('wld').value=new Date().toISOString().split('T')[0];
   calY=new Date().getFullYear();calM=new Date().getMonth();
-  // Safety: never get stuck on loader
-  const loaderTimeout=setTimeout(()=>{
-    console.warn('Init timeout — showing auth');
-    document.getElementById('loader').style.display='none';
-    document.getElementById('authScreen').style.display='flex';
-  },7000);
+
+  // Kill and re-register service worker to bust stale cache
+  if('serviceWorker' in navigator){
+    try{
+      const regs=await navigator.serviceWorker.getRegistrations();
+      for(const r of regs) await r.unregister();
+    }catch(e){}
+  }
+
+  const loaderSub=document.getElementById('loaderSub');
+  const loaderFill=document.querySelector('.loader-bar-fill');
+
+  function setLoaderProgress(pct,msg){
+    if(loaderFill)loaderFill.style.width=pct+'%';
+    if(loaderSub)loaderSub.textContent=msg;
+  }
+
+  setLoaderProgress(20,'CONNECTING...');
+
+  // Hard timeout — if anything hangs, show auth after 5s
+  const hardTimeout=setTimeout(()=>{
+    console.warn('Hard timeout fired — forcing auth screen');
+    showAuth();
+  },5000);
+
   try{
-    const {data,error}=await sb.auth.getSession();
-    clearTimeout(loaderTimeout);
-    if(data?.session){CU=data.session.user;await afterLogin();}
-    else showAuth();
+    setLoaderProgress(40,'CHECKING SESSION...');
+    // Race getSession against a 4s timeout
+    const sessionResult=await Promise.race([
+      sb.auth.getSession(),
+      new Promise((_,r)=>setTimeout(()=>r(new Error('session_timeout')),4000))
+    ]);
+    clearTimeout(hardTimeout);
+    setLoaderProgress(70,'LOADING...');
+    if(sessionResult?.data?.session){
+      CU=sessionResult.data.session.user;
+      await afterLogin();
+    }else{
+      showAuth();
+    }
   }catch(e){
-    clearTimeout(loaderTimeout);
-    console.error('Session error:',e);
+    clearTimeout(hardTimeout);
+    console.warn('Session check failed:',e.message);
     showAuth();
   }
 }
