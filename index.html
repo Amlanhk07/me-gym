@@ -570,19 +570,40 @@ let calY,calM,aLift=null,wChart=null,sChart=null,lChart=null;
 async function init(){
   document.getElementById('wld').value=new Date().toISOString().split('T')[0];
   calY=new Date().getFullYear();calM=new Date().getMonth();
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){CU=session.user;await afterLogin();}
-  else showAuth();
+  // Safety: never get stuck on loader
+  const loaderTimeout=setTimeout(()=>{
+    console.warn('Init timeout — showing auth');
+    document.getElementById('loader').style.display='none';
+    document.getElementById('authScreen').style.display='flex';
+  },7000);
+  try{
+    const {data,error}=await sb.auth.getSession();
+    clearTimeout(loaderTimeout);
+    if(data?.session){CU=data.session.user;await afterLogin();}
+    else showAuth();
+  }catch(e){
+    clearTimeout(loaderTimeout);
+    console.error('Session error:',e);
+    showAuth();
+  }
 }
 
 async function afterLogin(){
-  updateUserUI();buildDOM();await loadData();
-  document.getElementById('loader').style.display='none';
-  document.getElementById('app').style.display='block';
-  const tid=['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
-  const def=DAYS.find(d=>d.id===tid&&!d.isRest)||DAYS.find(d=>!d.isRest);
-  if(def)selDay(def.id);
-  setWkBadge();
+  try{
+    updateUserUI();
+    buildDOM();
+    await loadData();
+  }catch(e){
+    console.error('afterLogin error:',e);
+  }finally{
+    // Always hide loader no matter what
+    document.getElementById('loader').style.display='none';
+    document.getElementById('app').style.display='block';
+    const tid=['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
+    const def=DAYS.find(d=>d.id===tid&&!d.isRest)||DAYS.find(d=>!d.isRest);
+    if(def)selDay(def.id);
+    setWkBadge();
+  }
 }
 
 function showAuth(){
@@ -600,15 +621,29 @@ function updateUserUI(){
 
 async function loadData(){
   const uid=CU.id;
-  const[{data:sess},{data:wl},{data:prs},{data:str}]=await Promise.all([
-    sb.from('sessions').select('*,exercise_logs(*)').eq('user_id',uid).order('completed_at',{ascending:false}).limit(200),
-    sb.from('weight_logs').select('*').eq('user_id',uid).order('logged_at',{ascending:true}),
-    sb.from('personal_records').select('*').eq('user_id',uid),
-    sb.from('streaks').select('*').eq('user_id',uid).single()
-  ]);
-  SESS=sess||[];WL=wl||[];
-  PRs={};(prs||[]).forEach(p=>{PRs[p.exercise_name]=p});
-  if(str)STR=str;
+  // Each query is independent — one failing won't block the others
+  const withTimeout=(promise,ms=8000)=>Promise.race([promise,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
+  try{
+    const {data:sess}=await withTimeout(sb.from('sessions').select('*,exercise_logs(*)').eq('user_id',uid).order('completed_at',{ascending:false}).limit(200));
+    SESS=sess||[];
+  }catch(e){console.warn('sessions load failed:',e);SESS=[];}
+  try{
+    const {data:wl}=await withTimeout(sb.from('weight_logs').select('*').eq('user_id',uid).order('logged_at',{ascending:true}));
+    WL=wl||[];
+  }catch(e){console.warn('weight_logs load failed:',e);WL=[];}
+  try{
+    const {data:prs}=await withTimeout(sb.from('personal_records').select('*').eq('user_id',uid));
+    PRs={};(prs||[]).forEach(p=>{PRs[p.exercise_name]=p});
+  }catch(e){console.warn('PRs load failed:',e);PRs={};}
+  try{
+    const {data:str}=await withTimeout(sb.from('streaks').select('*').eq('user_id',uid).single());
+    if(str)STR=str;
+  }catch(e){console.warn('streak load failed:',e);}
+  // Ensure profile + streak row exist for new users
+  try{
+    await sb.from('profiles').upsert({id:uid,email:CU.email},{onConflict:'id',ignoreDuplicates:true});
+    await sb.from('streaks').upsert({user_id:uid},{onConflict:'user_id',ignoreDuplicates:true});
+  }catch(e){console.warn('profile upsert failed:',e);}
   loadWkState();renderAll();renderPRs();updateCharts();
 }
 
@@ -959,7 +994,20 @@ function toast(msg,isErr=false){
 
 // AUTH LISTENER
 sb.auth.onAuthStateChange(async(event,session)=>{
-  if(event==='SIGNED_IN'&&session&&!CU){CU=session.user;document.getElementById('authScreen').style.display='none';document.getElementById('loader').style.display='flex';await afterLogin();}
+  if(event==='SIGNED_IN'&&session&&!CU){
+    CU=session.user;
+    document.getElementById('authScreen').style.display='none';
+    document.getElementById('loader').style.display='flex';
+    // Small delay to let Supabase settle after OAuth redirect
+    setTimeout(async()=>{ await afterLogin(); },300);
+  }
+  // Handle token refresh failures gracefully
+  if(event==='TOKEN_REFRESHED'&&!session){
+    console.warn('Token refresh failed — signing out');
+    CU=null;
+    document.getElementById('app').style.display='none';
+    showAuth();
+  }
 });
 
 init();
