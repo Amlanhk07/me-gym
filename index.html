@@ -354,29 +354,32 @@ tr:last-child td{border-bottom:none}
 .em-sets{font-size:11px;color:var(--teal);font-weight:600;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;margin-top:2px}
 .em-close{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
 /* GIF area */
-.em-gif-wrap{width:100%;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;gap:0;overflow:hidden;position:relative;min-height:210px;align-items:center;justify-content:center}
-.em-gif-pair{display:flex;width:100%;height:220px}
-.em-gif-frame{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-.em-gif-frame+.em-gif-frame{border-left:1px solid var(--border)}
-.em-gif-frame img{width:100%;height:100%;object-fit:contain;padding:6px}
-.em-gif-label{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);backdrop-filter:blur(4px);color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;border-radius:20px;padding:2px 8px;white-space:nowrap}
-.em-gif-none{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text3);font-size:12px;width:100%;min-height:150px}
-.em-gif-none-icon{font-size:32px;opacity:.3}
+.em-gif-wrap{width:100%;background:radial-gradient(circle at 50% 40%,#15201a,#0a0d0b);border-bottom:1px solid var(--border);overflow:hidden;position:relative;min-height:260px;display:flex;align-items:center;justify-content:center}
+.em-gif-frame{width:100%;height:280px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.em-gif-frame img{max-width:100%;max-height:100%;width:auto;height:100%;object-fit:contain;opacity:0;transform:scale(.97);transition:opacity .4s ease,transform .4s ease}
+.em-gif-frame img.loaded{opacity:1;transform:scale(1)}
+.em-gif-skel{position:absolute;inset:0;background:linear-gradient(100deg,#11160f 30%,#1b2417 50%,#11160f 70%);background-size:200% 100%;animation:shimmer 1.3s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.em-gif-label{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;border-radius:20px;padding:3px 10px;white-space:nowrap;border:1px solid rgba(63,255,210,.2)}
+.em-gif-none{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text3);font-size:12px;width:100%;min-height:200px}
+.em-gif-none-icon{font-size:36px;opacity:.3}
 /* tabs */
 .em-tabs{display:flex;border-bottom:1px solid var(--border);background:#0c0f0d;position:sticky;top:56px;z-index:2}
 .em-tab{flex:1;padding:10px 4px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.8px;font-family:'JetBrains Mono',monospace;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;transition:all .18s;text-transform:uppercase;user-select:none}
 .em-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .em-panes{padding:16px 18px 0}
 .em-pane{display:none}
-.em-pane.active{display:block}
+.em-pane.active{display:block;animation:paneIn .28s ease}
+@keyframes paneIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 /* loading skeleton */
 .em-skel{background:var(--bg3);border-radius:8px;animation:skel 1.4s infinite}
 @keyframes skel{0%,100%{opacity:.4}50%{opacity:.8}}
-.em-skel-gif{height:220px;width:100%;border-radius:0}
 /* form steps */
 .em-steps{display:flex;flex-direction:column;gap:10px}
-.em-step{display:flex;gap:12px;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 13px;transition:border-color .2s}
-.em-step:hover{border-color:rgba(200,255,87,.2)}
+.em-step{display:flex;gap:12px;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 13px;transition:border-color .2s,transform .2s;opacity:0;animation:stepIn .35s ease forwards}
+.em-step:nth-child(1){animation-delay:.04s}.em-step:nth-child(2){animation-delay:.10s}.em-step:nth-child(3){animation-delay:.16s}.em-step:nth-child(4){animation-delay:.22s}.em-step:nth-child(5){animation-delay:.28s}
+@keyframes stepIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.em-step:hover{border-color:rgba(200,255,87,.25);transform:translateX(2px)}
 .em-step-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--bg);font-family:'Bebas Neue',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
 .em-step-text{font-size:13px;color:var(--text);line-height:1.55;padding-top:2px}
 .em-no-cues{text-align:center;padding:28px 16px;color:var(--text3);font-size:12px}
@@ -589,7 +592,7 @@ tr:last-child td{border-bottom:none}
       <button class="em-close" onclick="closeExModal()">✕</button>
     </div>
     <div id="emGif" class="em-gif-wrap">
-      <div class="em-skel em-skel-gif"></div>
+      <div class="em-gif-skel"></div>
     </div>
     <div class="em-tabs" id="emTabs">
       <div class="em-tab active" onclick="switchEmTab('form')">FORM GUIDE</div>
@@ -848,7 +851,7 @@ function buildDayViews(){
     const exH=d.exercises.map((ex,i)=>{
       const bg=ex.b?`<span class="eb b-${ex.b}">${ex.b.toUpperCase()}</span>`:'';
       const nt=ex.note?` <em style="color:var(--teal);font-style:normal;font-size:9px">${ex.note}</em>`:'';
-      return`<li class="ex-i" id="ex-${d.id}-${i}" onclick="tgEx('${d.id}',${i})"><div class="ex-tick">&#x2713;</div><div class="ex-c"><div class="ex-n">${ex.n}</div><div class="ex-d">${ex.s}${nt}</div></div><div class="ex-r">${bg}<span class="pr-t" id="pt-${d.id}-${i}">PR</span><button onclick="event.stopPropagation();openExModal('${ex.n.replace(/'/g,"\\'")}','${ex.s}')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:6px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;flex-shrink:0" title="View exercise guide">&#x2139;</button><div class="ww" onclick="event.stopPropagation()"><input class="wi" type="number" placeholder="—" min="0" max="500" step="2.5" id="wt-${d.id}-${i}" onchange="wtCh('${d.id}',${i},this.value)" inputmode="decimal"><span class="wu2">kg</span></div></div></li>`;
+      return`<li class="ex-i" id="ex-${d.id}-${i}" onclick="tgEx('${d.id}',${i})"><div class="ex-tick">&#x2713;</div><div class="ex-c"><div class="ex-n">${ex.n}</div><div class="ex-d">${ex.s}${nt}</div></div><div class="ex-r">${bg}<span class="pr-t" id="pt-${d.id}-${i}">PR</span><button onclick="event.stopPropagation();openExModal('${ex.n.replace(/'/g,"\\'")}','${ex.s}')" style="background:var(--teal-dim);border:1px solid rgba(63,255,210,.3);color:var(--teal);border-radius:20px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:.8px;cursor:pointer;flex-shrink:0;white-space:nowrap" title="View exercise guide">GUIDE</button><div class="ww" onclick="event.stopPropagation()"><input class="wi" type="number" placeholder="—" min="0" max="500" step="2.5" id="wt-${d.id}-${i}" onchange="wtCh('${d.id}',${i},this.value)" inputmode="decimal"><span class="wu2">kg</span></div></div></li>`;
     }).join('');
     return`<div class="dv" id="dv-${d.id}">
       <div class="wu">&#x1F525; <strong style="margin-right:4px">Warm-up:</strong> 5 min treadmill + dynamic stretch</div>
@@ -1157,22 +1160,39 @@ sb.auth.onAuthStateChange(async(event,session)=>{
 });
 
 // ═══════════════════════════════════════
-// EXERCISE MODAL — wger API
+// EXERCISE GUIDE — self-contained local data + bundled animated GIFs
 // ═══════════════════════════════════════
-const MUSCLE_NAMES={1:'Biceps brachii',2:'Anterior deltoid',3:'Serratus anterior',4:'Pectoralis major',5:'Triceps brachii',6:'Rectus abdominis',7:'Gastrocnemius',8:'Gluteus maximus',9:'Hamstrings',10:'Quadriceps femoris',11:'Soleus',12:'Tibialis anterior',13:'Latissimus dorsi',14:'Brachialis',15:'Obliquus externus abdominis',16:'Trapezius',17:'Erector spinae',18:'Rear deltoid',19:'Subscapularis',20:'Teres major'};
-
-const WGER_IDS={
-  'Barbell Bench Press':192,'Incline Dumbbell Press':28,'Cable Chest Fly':220,
-  'Seated DB Shoulder Press':61,'Lateral Raises':74,
-  'Tricep Rope Pushdown':85,'Overhead DB Tricep Ext.':31,
-  'Barbell Deadlift':81,'Lat Pulldown':102,'Seated Cable Row':110,
-  'Single-Arm DB Row':24,'Barbell Curl':111,'Hammer Curl':113,
-  'Barbell Back Squat':222,'Romanian Deadlift DB':79,
-  'Leg Press Machine':45,'Leg Curl Machine':116,'Walking Lunges':99,
-  'Standing Calf Raises':71,'Hanging Knee Raises':15,
-  'Cable Crunch':89,'Decline Sit-ups':91,'Russian Twists weighted':104,
-  'Plank Hold':305,'Ab Wheel Rollout':303,'Mountain Climbers':368,'Burpees':9,
-  'DB Thrusters squat+press':null,'Face Pulls':326,
+// Self-contained exercise data — animated GIFs bundled locally (work offline, no API dependency)
+const EX_DATA={
+  'Barbell Bench Press':{gif:'barbell-bench-press',primary:['Pectoralis Major'],secondary:['Triceps','Anterior Deltoid'],about:'The cornerstone upper-body strength lift. Builds chest, front delts and triceps while teaching full-body bracing under load.'},
+  'Incline Dumbbell Press':{gif:'incline-dumbbell-press',primary:['Upper Pectorals'],secondary:['Anterior Deltoid','Triceps'],about:'Targets the often-lagging upper chest. Dumbbells allow a deeper stretch and even left-right development.'},
+  'Cable Chest Fly':{gif:'cable-chest-fly',primary:['Pectoralis Major'],secondary:['Anterior Deltoid'],about:'Constant cable tension isolates the chest through a long arc — ideal for the squeeze and inner-chest detail.'},
+  'Seated DB Shoulder Press':{gif:'seated-db-shoulder-press',primary:['Anterior Deltoid','Lateral Deltoid'],secondary:['Triceps','Upper Pectorals'],about:'Primary mass-builder for the shoulders. Seated and braced keeps the focus on the delts, not momentum.'},
+  'Lateral Raises':{gif:'lateral-raises',primary:['Lateral Deltoid'],secondary:['Trapezius'],about:'The key to wider, capped shoulders. Light weight, strict form and slow negatives beat heavy swinging every time.'},
+  'Tricep Rope Pushdown':{gif:'tricep-rope-pushdown',primary:['Triceps'],secondary:['Forearms'],about:'A staple triceps isolation. Flaring the rope at the bottom maximises the contraction on all three heads.'},
+  'Overhead DB Tricep Ext.':{gif:'overhead-db-tricep-ext',primary:['Triceps (Long Head)'],secondary:[],about:'The overhead position stretches the long head of the triceps under load — crucial for overall arm thickness.'},
+  'Barbell Deadlift':{gif:'barbell-deadlift',primary:['Glutes','Hamstrings','Erector Spinae'],secondary:['Lats','Trapezius','Forearms','Quads'],about:'The ultimate full-body strength builder. Trains the entire posterior chain and grip while reinforcing a braced, neutral spine.'},
+  'Lat Pulldown':{gif:'lat-pulldown',primary:['Latissimus Dorsi'],secondary:['Biceps','Rear Deltoid'],about:'Builds the V-taper. Driving the elbows down and back recruits the lats far better than just pulling with the arms.'},
+  'Seated Cable Row':{gif:'seated-cable-row',primary:['Latissimus Dorsi','Rhomboids'],secondary:['Biceps','Rear Deltoid'],about:'A complete mid-back builder. Squeezing the shoulder blades at the end develops thickness and posture.'},
+  'Single-Arm DB Row':{gif:'single-arm-db-row',primary:['Latissimus Dorsi','Rhomboids'],secondary:['Biceps','Rear Deltoid'],about:'Unilateral rowing irons out left-right imbalances and allows a bigger range of motion than barbell rows.'},
+  'Barbell Curl':{gif:'barbell-curl',primary:['Biceps Brachii'],secondary:['Forearms'],about:'The classic biceps mass-builder. Strict form and a controlled negative are what drive the growth.'},
+  'Hammer Curl':{gif:'hammer-curl',primary:['Brachialis','Biceps'],secondary:['Forearms'],about:'The neutral grip hits the brachialis underneath the biceps and the forearms — adds width and thickness to the arm.'},
+  'Barbell Back Squat':{gif:'barbell-back-squat',primary:['Quadriceps','Glutes'],secondary:['Hamstrings','Core','Erector Spinae'],about:'The king of leg exercises. Builds total lower-body strength and size while heavily taxing the core and back.'},
+  'Romanian Deadlift DB':{gif:'romanian-deadlift-db',primary:['Hamstrings','Glutes'],secondary:['Erector Spinae','Forearms'],about:'A hip-hinge that loads the hamstrings in their stretched position — the best hamstring and glute developer.'},
+  'Leg Press Machine':{gif:'leg-press-machine',primary:['Quadriceps','Glutes'],secondary:['Hamstrings'],about:'Lets you overload the legs safely without spinal loading. Foot placement shifts emphasis between quads and glutes.'},
+  'Leg Curl Machine':{gif:'leg-curl-machine',primary:['Hamstrings'],secondary:['Calves'],about:'Isolates the hamstrings through knee flexion — the perfect complement to hip-hinge movements for complete leg development.'},
+  'Walking Lunges':{gif:'walking-lunges',primary:['Quadriceps','Glutes'],secondary:['Hamstrings','Calves'],about:'A unilateral leg builder that also trains balance and stability. Big stretch on the glutes with every step.'},
+  'Standing Calf Raises':{gif:'standing-calf-raises',primary:['Gastrocnemius'],secondary:['Soleus'],about:'Trains the larger calf muscle. A full stretch at the bottom and a pause at the top under high reps is the key to stubborn calves.'},
+  'Hanging Knee Raises':{gif:'hanging-knee-raises',primary:['Lower Abs','Hip Flexors'],secondary:['Obliques','Forearms'],about:'One of the best lower-ab movements. Curling the pelvis up (not just lifting the knees) is what hits the abs hardest.'},
+  'Cable Crunch':{gif:'cable-crunch',primary:['Rectus Abdominis'],secondary:['Obliques'],about:'Weighted ab training for real growth. Crunching down with the abs — not pulling with the arms — is essential.'},
+  'Decline Sit-ups':{gif:'decline-situps',primary:['Rectus Abdominis'],secondary:['Hip Flexors'],about:'The decline angle increases the range and load on the abs versus flat sit-ups. Control the descent for max tension.'},
+  'Russian Twists weighted':{gif:'russian-twists',primary:['Obliques'],secondary:['Rectus Abdominis'],about:'Rotational core work that builds the obliques. Rotate the torso, not just the arms, for it to count.'},
+  'Plank Hold':{gif:'plank-hold',primary:['Core / Transverse Abdominis'],secondary:['Shoulders','Glutes'],about:'An isometric that builds deep core stability and anti-extension strength — the foundation for all heavy lifting.'},
+  'Ab Wheel Rollout':{gif:'ab-wheel-rollout',primary:['Rectus Abdominis','Core'],secondary:['Lats','Shoulders'],about:'One of the most demanding ab exercises. Bracing hard to keep the spine from arching is what makes it so effective.'},
+  'Mountain Climbers':{gif:'mountain-climbers',primary:['Core','Hip Flexors'],secondary:['Shoulders','Quads'],about:'A cardio-core hybrid. Keeping the hips low and steady turns it into serious anti-rotation core work.'},
+  'Burpees':{gif:'burpees',primary:['Full Body'],secondary:['Chest','Quads','Core'],about:'A full-body conditioning movement that spikes the heart rate fast. Excellent for fat loss and work capacity.'},
+  'DB Thrusters squat+press':{gif:'db-thrusters',primary:['Quadriceps','Glutes','Shoulders'],secondary:['Triceps','Core'],about:'A squat-to-press combo that trains the whole body in one explosive movement — huge metabolic and strength stimulus.'},
+  'Face Pulls':{gif:'face-pulls',primary:['Rear Deltoid','Trapezius'],secondary:['Rotator Cuff'],about:'The best insurance for healthy shoulders. Strengthens the rear delts and upper back to balance all the pressing.'},
 };
 
 const FORM_CUES={'Barbell Bench Press':['Lie flat, feet planted, arch lower back slightly','Grip slightly wider than shoulder width, wrists straight','Lower bar to lower chest, elbows at 45 degrees from torso','Press explosively up, do not shrug shoulders at top'],'Incline Dumbbell Press':['Set bench to 30-45 degrees, dumbbells at shoulder level','Keep chest up, squeeze shoulder blades together','Lower until elbows are slightly below bench','Press up and slightly inward, squeeze chest at top'],'Cable Chest Fly':['Stand between cables, slight forward lean','Keep a slight bend in elbows throughout','Bring hands together in a hugging arc','Squeeze chest hard at peak, control the return'],'Seated DB Shoulder Press':['Sit upright, core tight, feet flat','Start with dumbbells at ear level, palms forward','Press straight up, do not lock elbows at top','Lower slowly — 2 seconds down'],'Lateral Raises':['Stand tall, slight bend at elbows','Raise arms to shoulder height only','Lead with elbows, not wrists','Lower slowly — this is where growth happens'],'Tricep Rope Pushdown':['Elbows pinned to sides throughout','Push rope down and flare wrists out at bottom','Squeeze triceps hard at bottom','Control the return — do not let it fly up'],'Overhead DB Tricep Ext.':['Hold dumbbell overhead with both hands','Elbows pointing forward, not flaring out','Lower behind head until forearms parallel floor','Press up to full extension, squeeze triceps'],'Barbell Deadlift':['Feet hip-width, bar over mid-foot','Grip just outside legs, spine neutral throughout','Push the floor away — do not pull with your back','Hips and shoulders rise at same rate off the floor','Lock out by squeezing glutes, not hyperextending back'],'Lat Pulldown':['Grip slightly wider than shoulder width, lean back 10 degrees','Pull bar to upper chest, lead with elbows','Squeeze lats at bottom — pause 1 second','Let bar rise slowly, feel the stretch at top'],'Seated Cable Row':['Sit tall, chest up, slight arch in lower back','Pull handle to lower sternum, elbows go back','Squeeze shoulder blades together at end','Return slowly — full stretch at front is key'],'Single-Arm DB Row':['Support with opposite hand and knee on bench','Keep spine neutral, parallel to floor','Pull dumbbell to hip, elbow travels straight back','Lower slowly, get a full shoulder stretch'],'Face Pulls':['Set cable at face height, use rope attachment','Pull rope to forehead, elbows above wrists','Rotate hands outward at end — thumbs back','Controls rear delts and rotator cuff health'],'Barbell Curl':['Stand tall, elbows pinned to sides','Curl bar up without swinging torso','Squeeze biceps hard at the top','Lower over 3 seconds — the negative builds muscle'],'Hammer Curl':['Neutral grip — palms facing each other','Curl with control, no swinging','Works brachialis and forearms more than regular curl','Alternate arms or do both simultaneously'],'Barbell Back Squat':['Bar on upper traps, feet shoulder width, toes out 15-30 degrees','Big breath and brace core before descending','Knees track over toes, sit between legs','Break parallel — crease of hip below top of knee','Drive up through heels, hips and chest rise together'],'Romanian Deadlift DB':['Hold dumbbells in front, slight knee bend','Hinge at hips — push hips BACK, not down','Feel the hamstring stretch, keep back flat','Drive hips forward to return, squeeze glutes at top'],'Leg Press Machine':['Feet shoulder width, mid-plate, toes slightly out','Lower until knees reach 90 degrees — no lower','Press through whole foot, do not lock knees','Never let lower back peel off the pad'],'Leg Curl Machine':['Lie face down, pad just above ankles','Curl heels toward glutes, full range','Squeeze hamstrings at top, lower slowly','Do not let hips rise off the pad'],'Walking Lunges':['Front knee over ankle, not past toes','Back knee lowers just above the floor','Keep torso upright, core engaged','Push off front foot to step forward'],'Standing Calf Raises':['Full range: deep stretch at bottom, full rise at top','Pause 1 second at peak contraction','Go slow — calves respond to time under tension','3 sets of 15-20 reps minimum'],'Hanging Knee Raises':['Hang from bar, shoulders packed down','Bring knees to chest by curling pelvis up','Do not swing — control the movement','Lower slowly to maximize core engagement'],'Cable Crunch':['Kneel at cable, rope at back of head','Crunch DOWN toward knees, not forward','Move from the abs — do not pull with arms','Round your back — correct form here'],'Decline Sit-ups':['Anchor feet, hands lightly behind head','Curl up through full range','Do not pull neck with your hands','Lower slowly — 3 seconds down'],'Russian Twists weighted':['Sit at 45 degrees, feet slightly elevated','Rotate torso side to side, not just arms','Keep chest up, do not collapse forward','Add weight once bodyweight becomes easy'],'Plank Hold':['Forearms on floor, body straight as a board','Do not let hips sag or pike up','Breathe normally — squeeze abs and glutes','Build from 30s to 60s to 90s over weeks'],'Ab Wheel Rollout':['Start kneeling, wheel directly under shoulders','Roll forward keeping core braced — back must not arch','Go as far as you can control, then roll back','This is harder than it looks — start with small range'],'Mountain Climbers':['High plank position, hands under shoulders','Drive knees to chest alternately, stay level','Keep hips down, do not bounce them','Fast for cardio effect, slow for core strength'],'Cycling Sprint HIIT':['Resistance medium-high for sprints','30s all-out effort, 90s easy recovery × 10 rounds','Keep cadence high during sprints — above 80 RPM','Burns 200-300 extra calories post-workout (EPOC effect)'],'Burpees':['Squat down, jump feet back to plank','Do a push-up then jump feet back to hands','Explode upward, clap overhead at the top','Full extension at the top — every rep'],'DB Thrusters squat+press':['Hold dumbbells at shoulders, feet shoulder width','Squat to parallel, drive up explosively','Use the squat momentum to press overhead','One fluid movement — squat and press together'],'Plank to Push-up':['Start in forearm plank position','Push up to high plank one arm at a time','Lower back to forearm plank one arm at a time','Alternate which arm leads each rep'],'Battle Ropes / Jump Rope':['Battle rope: anchor low, stand with slight squat','Alternate waves — keep rhythm for full 30 seconds','Jump rope: light on feet, wrists do the turning','Both are excellent cardio and shoulder conditioning'],'Treadmill Incline 5 Speed 5.5':['Incline 5 increases calorie burn by ~50% vs flat','Hold steady pace, do not hold onto rails','Swing arms naturally, look forward not down','Target heart rate: 130-150 BPM for fat burn zone'],'Cross Trainer Resistance 7':['Use arm handles actively — do not just stand','Keep resistance high enough to feel challenged','Smooth circular motion, do not bounce','Great low-impact cardio — burns similar to running']};
@@ -1191,82 +1211,33 @@ function switchEmTab(name){
   document.getElementById('emSheet').scrollTo({top:0,behavior:'smooth'});
 }
 
-async function openExModal(exName, exSets) {
+function openExModal(exName, exSets) {
   const modal=document.getElementById('exModal');
   document.getElementById('emTitle').textContent=exName;
   document.getElementById('emSets').textContent=exSets?'TARGET: '+exSets:'';
-  // Reset to loading state
-  document.getElementById('emGif').innerHTML='<div class="em-skel em-skel-gif"></div>';
-  document.getElementById('empForm').innerHTML='<div class="em-skel" style="height:72px;border-radius:12px;margin-bottom:10px"></div><div class="em-skel" style="height:72px;border-radius:12px;margin-bottom:10px"></div><div class="em-skel" style="height:72px;border-radius:12px"></div>';
-  document.getElementById('empMuscles').innerHTML='';
-  document.getElementById('empAbout').innerHTML='';
   switchEmTab('form');
   modal.classList.add('open');
   exModalOpen=true;
   document.body.style.overflow='hidden';
-  try {
-    const data=await fetchWgerExercise(exName);
-    renderExModal(exName,exSets,data);
-  } catch(e) {
-    console.warn('wger fetch error:',e);
-    renderExModal(exName,exSets,null);
-  }
-}
-
-async function fetchWgerExercise(exName) {
-  const hid=WGER_IDS[exName];
-  if(hid){
-    try{
-      const r=await fetch('https://wger.de/api/v2/exerciseinfo/'+hid+'/?format=json');
-      if(r.ok)return await r.json();
-    }catch(e){}
-  }
-  try{
-    const term=encodeURIComponent(exName.split(' ').slice(0,3).join(' '));
-    const r=await fetch('https://wger.de/api/v2/exercise/search/?term='+term+'&language=english&format=json');
-    if(r.ok){
-      const sd=await r.json();
-      const suggestions=sd.suggestions||[];
-      if(suggestions.length>0){
-        const id=suggestions[0].data?.id||suggestions[0].id;
-        if(id){
-          const r2=await fetch('https://wger.de/api/v2/exerciseinfo/'+id+'/?format=json');
-          if(r2.ok)return await r2.json();
-        }
-      }
-    }
-  }catch(e){}
-  return null;
+  renderExModal(exName,exSets,EX_DATA[exName]||null);
 }
 
 function renderExModal(exName,exSets,data) {
   const cues=FORM_CUES[exName]||[];
 
-  // ── GIF panel ──
+  // ── Animated GIF panel (bundled locally, works offline) ──
   const gifWrap=document.getElementById('emGif');
-  if(data&&(data.images||[]).length){
-    const imgs=data.images.slice(0,2);
-    const labels=['START','END'];
-    if(imgs.length===1){
-      gifWrap.innerHTML=
-        '<div class="em-gif-pair">'+
-          '<div class="em-gif-frame" style="max-width:100%">'+
-            '<img src="'+imgs[0].image+'" alt="'+exName+'" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=em-gif-none><div class=em-gif-none-icon>🏋️</div>No animation available</div>\'">'+
-            '<span class="em-gif-label">ANIMATION</span>'+
-          '</div>'+
-        '</div>';
-    }else{
-      gifWrap.innerHTML='<div class="em-gif-pair">'+
-        imgs.map((img,i)=>
-          '<div class="em-gif-frame">'+
-            '<img src="'+img.image+'" alt="'+exName+' '+labels[i]+'" loading="lazy" onerror="this.parentElement.innerHTML=\'\'">'+
-            '<span class="em-gif-label">'+labels[i]+'</span>'+
-          '</div>'
-        ).join('')+
+  if(data&&data.gif){
+    gifWrap.innerHTML=
+      '<div class="em-gif-frame">'+
+        '<div class="em-gif-skel"></div>'+
+        '<img src="exercises/'+data.gif+'.gif" alt="'+exName+' demonstration" '+
+          'onload="this.previousElementSibling.style.display=\'none\';this.classList.add(\'loaded\')" '+
+          'onerror="this.parentElement.parentElement.innerHTML=\'<div class=em-gif-none><div class=em-gif-none-icon>🏋️</div><span>Animation unavailable</span></div>\'">'+
+        '<span class="em-gif-label">◉ LIVE DEMO</span>'+
       '</div>';
-    }
   }else{
-    gifWrap.innerHTML='<div class="em-gif-none"><div class="em-gif-none-icon">🏋️</div><span>'+(data?'No animation in database for this exercise':'Could not reach wger.de — check connection')+'</span></div>';
+    gifWrap.innerHTML='<div class="em-gif-none"><div class="em-gif-none-icon">🏋️</div><span>Follow the form guide below</span></div>';
   }
 
   // ── FORM GUIDE tab ──
@@ -1286,41 +1257,29 @@ function renderExModal(exName,exSets,data) {
 
   // ── MUSCLES tab ──
   const musclesPane=document.getElementById('empMuscles');
-  if(data){
-    const primary=(data.muscles||[]).map(m=>MUSCLE_NAMES[m.id]||m.name_en||m.name||'').filter(Boolean);
-    const secondary=(data.muscles_secondary||[]).map(m=>MUSCLE_NAMES[m.id]||m.name_en||m.name||'').filter(Boolean);
+  if(data&&((data.primary||[]).length||(data.secondary||[]).length)){
     let html='<div class="em-muscle-wrap">';
-    if(primary.length){
-      html+='<div class="em-muscle-group"><div class="em-muscle-group-lbl">Primary Muscles</div><div class="em-muscles">'+
-        primary.map(m=>'<span class="em-muscle">'+m+'</span>').join('')+
+    if((data.primary||[]).length){
+      html+='<div class="em-muscle-group"><div class="em-muscle-group-lbl">Primary Movers</div><div class="em-muscles">'+
+        data.primary.map(m=>'<span class="em-muscle">'+m+'</span>').join('')+
       '</div></div>';
     }
-    if(secondary.length){
+    if((data.secondary||[]).length){
       html+='<div class="em-muscle-group"><div class="em-muscle-group-lbl">Secondary / Supporting</div><div class="em-muscles">'+
-        secondary.map(m=>'<span class="em-muscle sec">'+m+'</span>').join('')+
+        data.secondary.map(m=>'<span class="em-muscle sec">'+m+'</span>').join('')+
       '</div></div>';
-    }
-    if(!primary.length&&!secondary.length){
-      html+='<div class="em-no-data">No muscle data available from wger for this exercise.</div>';
     }
     musclesPane.innerHTML=html+'</div>';
   }else{
-    musclesPane.innerHTML='<div class="em-no-data">Muscle data unavailable — could not connect to wger.de.</div>';
+    musclesPane.innerHTML='<div class="em-no-data">No muscle data for this exercise yet.</div>';
   }
 
   // ── ABOUT tab ──
   const aboutPane=document.getElementById('empAbout');
-  if(data){
-    const translations=data.translations||[];
-    const eng=translations.find(t=>t.language===2);
-    const rawDesc=(eng?.description||'').replace(/<[^>]*>/g,'').trim();
-    if(rawDesc&&rawDesc.length>10){
-      aboutPane.innerHTML='<div class="em-desc">'+rawDesc.slice(0,600)+(rawDesc.length>600?'…':'')+'</div>';
-    }else{
-      aboutPane.innerHTML='<div class="em-no-data">No description available for this exercise in wger.</div>';
-    }
+  if(data&&data.about){
+    aboutPane.innerHTML='<div class="em-desc">'+data.about+'</div>';
   }else{
-    aboutPane.innerHTML='<div class="em-no-data">Description unavailable — could not connect to wger.de.</div>';
+    aboutPane.innerHTML='<div class="em-no-data">No description for this exercise yet.</div>';
   }
 }
 
