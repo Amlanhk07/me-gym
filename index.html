@@ -321,6 +321,26 @@ tr:last-child td{border-bottom:none}
 .footer{text-align:center;padding:20px 0 8px;color:var(--text3);font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:2px}
 @media(max-width:380px){.stat-grid{grid-template-columns:repeat(2,1fr)}.ig{grid-template-columns:1fr 1fr}}
 
+/* QUOTE CARD */
+.qcard{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:13px;position:relative;overflow:hidden}
+.qcard::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,255,87,.04) 0%,transparent 60%);pointer-events:none}
+.q-mark{font-family:'Bebas Neue',sans-serif;font-size:36px;color:rgba(200,255,87,.18);line-height:.8;margin-bottom:6px;display:block}
+.q-text{font-size:14px;font-weight:500;line-height:1.55;color:var(--text);margin-bottom:8px}
+.q-attr{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:1px;text-align:right}
+
+/* STAT CARD UPGRADE */
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:11px 6px;text-align:center;transition:border-color .2s}
+.stat-card:hover{border-color:var(--border2)}
+
+/* WORKOUT DAY HEADER UPGRADE */
+.dh{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:7px;transition:all .3s;position:relative;overflow:hidden}
+.dh::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 55%,rgba(200,255,87,.03));pointer-events:none}
+.dh.comp{background:var(--done-bg);border-color:var(--done-border)}
+.dh.comp::before{background:linear-gradient(135deg,transparent 55%,rgba(200,255,87,.06))}
+
+/* XP BADGE */
+.xp-b{display:flex;align-items:center;gap:3px;background:var(--purple-dim);border:1px solid rgba(167,139,250,.2);border-radius:20px;padding:3px 9px;font-size:10px;color:var(--purple);font-family:'JetBrains Mono',monospace}
+
 /* ── EXERCISE MODAL ── */
 #exModal{position:fixed;inset:0;z-index:500;display:none;align-items:flex-end;justify-content:center}
 #exModal.open{display:flex}
@@ -395,6 +415,7 @@ tr:last-child td{border-bottom:none}
       <div class="hdr-r">
         <div class="wk-b" id="wkB">WEEK 5</div>
         <div class="str-b">&#x1F525;<span id="strN">0</span>d</div>
+        <div class="xp-b">&#x1F3C6;<span id="xpN">0</span> XP</div>
         <div class="usr-btn" id="uBtn" onclick="toggleMenu()">U</div>
       </div>
     </div>
@@ -418,6 +439,11 @@ tr:last-child td{border-bottom:none}
   <div class="wrap">
 
     <div class="page active" id="tab-today">
+      <div class="qcard" id="quoteCard">
+        <span class="q-mark">"</span>
+        <div class="q-text" id="qText">A one hour workout is 4% of your day. No excuses.</div>
+        <div class="q-attr" id="qAttr">— Dr. Joe Komar</div>
+      </div>
       <div class="prog-card">
         <div class="prog-head">
           <span class="prog-title">This Week <span class="sdot" id="sd" style="display:none"></span></span>
@@ -623,12 +649,31 @@ const TE=['Done! ✓','Nailed it! 🎯','Progress! 💪','Keep going! 🔥'];
 const TU=['Unchecked.','Taking it back? 😄'];
 const TP=['🏆 NEW PR!','Personal Record! 🏆','All-time best! 🔥'];
 
+const QUOTES=[
+  {text:"A one hour workout is 4% of your day. No excuses.",attr:"Dr. Joe Komar"},
+  {text:"The only bad workout is the one that didn't happen.",attr:"Unknown"},
+  {text:"Your body can stand almost anything. It's your mind you have to convince.",attr:"Unknown"},
+  {text:"Success isn't always about greatness. It's about consistency.",attr:"Dwayne Johnson"},
+  {text:"You don't have to be extreme, just consistent.",attr:"Unknown"},
+  {text:"Push yourself because no one else is going to do it for you.",attr:"Unknown"},
+  {text:"Strength does not come from the body. It comes from the will of the soul.",attr:"Gandhi"},
+  {text:"Train insane or remain the same.",attr:"Unknown"},
+  {text:"The pain you feel today will be the strength you feel tomorrow.",attr:"Arnold Schwarzenegger"},
+  {text:"Don't count the days, make the days count.",attr:"Muhammad Ali"},
+];
 let CU=null,LS={},LW={},SESS=[],WL=[],PRs={},STR={current_streak:0,longest_streak:0,last_session_date:null};
 let calY,calM,aLift=null,wChart=null,sChart=null,lChart=null;
+
+function rotateQuote(){
+  const q=QUOTES[Math.floor(new Date().getDate())%QUOTES.length];
+  document.getElementById('qText').textContent=q.text;
+  document.getElementById('qAttr').textContent='— '+q.attr;
+}
 
 async function init(){
   document.getElementById('wld').value=new Date().toISOString().split('T')[0];
   calY=new Date().getFullYear();calM=new Date().getMonth();
+  rotateQuote();
 
   // Unregister old service workers to bust stale cache
   if('serviceWorker' in navigator){
@@ -957,6 +1002,8 @@ function rdProg(){
   document.getElementById('pC').textContent=done+' / '+total;document.getElementById('sW').textContent=done;
   document.getElementById('sA').textContent=SESS.length;document.getElementById('sS').textContent=STR.current_streak||0;
   document.getElementById('sP').textContent=Object.keys(PRs).length;document.getElementById('strN').textContent=STR.current_streak||0;
+  const xp=SESS.length*50+Object.keys(PRs).length*100+(STR.current_streak||0)*10;
+  document.getElementById('xpN').textContent=xp;
   const msgs=['Tap exercises to track 💪','Good start!','Halfway! 🔥','Almost done!','Perfect week! 🏆'];
   document.getElementById('pM').textContent=msgs[Math.min(done,msgs.length-1)];
 }
@@ -1149,7 +1196,7 @@ function renderExModal(exName,exSets,data) {
   if(data){
     const imgs=(data.images||[]).slice(0,2);
     if(imgs.length){
-      imgsHTML='<div class="em-imgs">'+imgs.map(img=>'<div class="em-img"><img src="'+img.image+'" alt="'+exName+'" loading="lazy" onerror="this.parentElement.style.display='none'"></div>').join('')+'</div>';
+      imgsHTML='<div class="em-imgs">'+imgs.map(img=>'<div class="em-img"><img src="'+img.image+'" alt="'+exName+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></div>').join('')+'</div>';
     }else{
       imgsHTML='<div class="em-imgs"><div class="em-no-img">No images in database for this exercise</div></div>';
     }
