@@ -370,6 +370,12 @@ tr:last-child td{border-bottom:none}
 .em-gif-label{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;border-radius:20px;padding:3px 10px;white-space:nowrap;border:1px solid rgba(63,255,210,.2)}
 .em-gif-none{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text3);font-size:12px;width:100%;min-height:200px}
 .em-gif-none-icon{font-size:36px;opacity:.3}
+.em-watch{display:flex;align-items:center;gap:11px;margin:12px 16px 0;padding:10px 13px;background:linear-gradient(135deg,rgba(63,255,210,.09),rgba(167,139,250,.06));border:1px solid rgba(63,255,210,.22);border-radius:13px}
+.em-watch-ic{font-size:21px;flex-shrink:0;line-height:1}
+.em-watch-tx{min-width:0}
+.em-watch-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.em-watch-val{font-size:13px;font-weight:700;color:var(--teal);margin-top:2px}
+.em-watch-tip{font-size:10px;color:var(--text2);margin-top:2px;line-height:1.35}
 /* tabs */
 .em-tabs{display:flex;border-bottom:1px solid var(--border);background:#0c0f0d;position:sticky;top:56px;z-index:2}
 .em-tab{flex:1;padding:10px 4px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.8px;font-family:'JetBrains Mono',monospace;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;transition:all .18s;text-transform:uppercase;user-select:none}
@@ -602,6 +608,7 @@ tr:last-child td{border-bottom:none}
     <div id="emGif" class="em-gif-wrap">
       <div class="em-gif-skel"></div>
     </div>
+    <div id="emWatch" class="em-watch"></div>
     <div class="em-tabs" id="emTabs">
       <div class="em-tab active" onclick="switchEmTab('form')">FORM GUIDE</div>
       <div class="em-tab" onclick="switchEmTab('muscles')">MUSCLES</div>
@@ -797,12 +804,17 @@ async function loadData(){
 function loadWkState(){
   const ws=getWkStart(new Date());LS={};
   SESS.filter(s=>new Date(s.completed_at)>=ws).forEach(s=>{
-    LS[s.day_id]={done:true,ex:{},notes:s.notes||''};
     const d=DAYS.find(x=>x.id===s.day_id);
-    if(d)(s.exercise_logs||[]).forEach(el=>{
+    if(!d)return;
+    LS[s.day_id]={done:false,ex:{},notes:s.notes||''};
+    (s.exercise_logs||[]).forEach(el=>{
       const idx=d.exercises.findIndex(e=>e.n===el.exercise_name);
-      if(idx>=0){LS[s.day_id].ex[idx]=true;if(!LW[s.day_id])LW[s.day_id]={};if(el.weight_kg)LW[s.day_id][idx]=el.weight_kg;}
+      if(idx>=0){
+        if(el.completed)LS[s.day_id].ex[idx]=true;
+        if(el.weight_kg){if(!LW[s.day_id])LW[s.day_id]={};LW[s.day_id][idx]=el.weight_kg;}
+      }
     });
+    LS[s.day_id].done=d.exercises.length>0&&Object.values(LS[s.day_id].ex).filter(Boolean).length>=d.exercises.length;
   });
 }
 
@@ -927,9 +939,10 @@ async function tgEx(day,idx){
   const was=!!LS[day].ex[idx];LS[day].ex[idx]=!was;
   const total=d.exercises.length;
   const done=Object.values(LS[day].ex).filter(Boolean).length;
-  if(done===total){LS[day].done=true;await syncSess(day);bumpStr();toast(TD[~~(Math.random()*TD.length)]);}
+  if(done===total){LS[day].done=true;bumpStr();toast(TD[~~(Math.random()*TD.length)]);}
   else{LS[day].done=false;toast(was?TU[~~(Math.random()*TU.length)]:TE[~~(Math.random()*TE.length)]);}
   rdDay(day);rdProg();rdWkOvItems();
+  await syncSess(day); // persist every tick so progress survives a reload
 }
 
 async function mDay(day){
@@ -938,9 +951,10 @@ async function mDay(day){
   if(!LS[day].done){
     LS[day].done=true;LS[day].ex={};
     for(let i=0;i<total;i++)LS[day].ex[i]=true;
-    await syncSess(day);bumpStr();toast(TD[~~(Math.random()*TD.length)]);
+    bumpStr();toast(TD[~~(Math.random()*TD.length)]);
   }else{LS[day].done=false;LS[day].ex={};toast('Reset! 🔄');}
   rdDay(day);rdProg();rdWkOvItems();
+  await syncSess(day); // persist both completing and resetting a day
 }
 
 // WEIGHTS
@@ -969,19 +983,40 @@ function svNt(day,val){if(!LS[day])LS[day]={ex:{},done:false};LS[day].notes=val;
 function ldNt(day){const el=document.getElementById('nt-'+day);if(el&&LS[day]?.notes)el.value=LS[day].notes;}
 
 // SYNC
-async function syncSess(day){
-  showSync(true);
-  const d=DAYS.find(x=>x.id===day);
-  const ws=getWkStart(new Date()).toISOString().split('T')[0];
-  const{data:sess}=await sb.from('sessions').upsert({user_id:CU.id,day_id:day,day_name:d.name,completed_at:new Date().toISOString(),week_start:ws,notes:LS[day]?.notes||''},{onConflict:'user_id,day_id,week_start'}).select().single();
-  if(sess){
-    await sb.from('exercise_logs').delete().eq('session_id',sess.id);
-    const wts=LW[day]||{};
-    await sb.from('exercise_logs').insert(d.exercises.map((ex,i)=>({session_id:sess.id,user_id:CU.id,exercise_name:ex.n,sets:3,reps:ex.s,weight_kg:wts[i]||null,completed:!!LS[day]?.ex?.[i]})));
-    const{data:all}=await sb.from('sessions').select('*,exercise_logs(*)').eq('user_id',CU.id).order('completed_at',{ascending:false}).limit(200);
-    SESS=all||[];document.getElementById('sA').textContent=SESS.length;
-  }
-  showSync(false);
+// Per-day write queue + revision guard: rapid taps are serialized so destructive
+// writes never overlap, and only the most recent change refreshes shared state.
+const _syncQ={};const _syncRev={};
+function syncSess(day){
+  const rev=(_syncRev[day]=(_syncRev[day]||0)+1);
+  const run=async()=>{
+    showSync(true);
+    const d=DAYS.find(x=>x.id===day);
+    const ws=getWkStart(new Date()).toISOString().split('T')[0];
+    const anyDone=Object.values(LS[day]?.ex||{}).some(Boolean);
+    try{
+      if(!anyDone){
+        // Nothing ticked for this day this week — remove any saved session so it resets cleanly
+        const{data:rows}=await sb.from('sessions').select('id').eq('user_id',CU.id).eq('day_id',day).eq('week_start',ws);
+        for(const r of (rows||[])){await sb.from('exercise_logs').delete().eq('session_id',r.id);await sb.from('sessions').delete().eq('id',r.id);}
+      }else{
+        const{data:sess,error}=await sb.from('sessions').upsert({user_id:CU.id,day_id:day,day_name:d.name,completed_at:new Date().toISOString(),week_start:ws,notes:LS[day]?.notes||''},{onConflict:'user_id,day_id,week_start'}).select().single();
+        if(error)throw error;
+        if(sess){
+          await sb.from('exercise_logs').delete().eq('session_id',sess.id);
+          const wts=LW[day]||{};
+          await sb.from('exercise_logs').insert(d.exercises.map((ex,i)=>({session_id:sess.id,user_id:CU.id,exercise_name:ex.n,sets:3,reps:ex.s,weight_kg:wts[i]||null,completed:!!LS[day]?.ex?.[i]})));
+        }
+      }
+      // Only the newest queued change is allowed to refresh the shared session list
+      if(rev===_syncRev[day]){
+        const{data:all}=await sb.from('sessions').select('*,exercise_logs(*)').eq('user_id',CU.id).order('completed_at',{ascending:false}).limit(200);
+        SESS=all||[];document.getElementById('sA').textContent=SESS.filter(sessDone).length;
+      }
+    }catch(e){console.warn('syncSess failed:',e);toast('Could not save — check connection',true);}
+    finally{if(rev===_syncRev[day])showSync(false);}
+  };
+  _syncQ[day]=(_syncQ[day]||Promise.resolve()).then(run,run);
+  return _syncQ[day];
 }
 function showSync(on){const d=document.getElementById('sd');if(d)d.style.display=on?'inline-block':'none';}
 
@@ -1009,6 +1044,8 @@ async function bumpStr(){
 }
 
 // RENDER
+// A session counts as a real "completed day" only when every exercise in it is ticked
+function sessDone(s){const d=DAYS.find(x=>x.id===s.day_id);if(!d||!d.exercises.length)return false;return (s.exercise_logs||[]).filter(l=>l.completed).length>=d.exercises.length;}
 function renderAll(){WD.forEach(d=>rdDay(d));rdProg();rdWkOvItems();}
 function rdDay(day){
   const d=DAYS.find(x=>x.id===day);if(!d||d.isRest)return;
@@ -1026,10 +1063,11 @@ function rdDay(day){
 function rdProg(){
   const done=WD.filter(d=>LS[d]&&LS[d].done).length;const total=WD.length;
   document.getElementById('pF').style.width=Math.round(done/total*100)+'%';
+  const cs=SESS.filter(sessDone).length;
   document.getElementById('pC').textContent=done+' / '+total;document.getElementById('sW').textContent=done;
-  document.getElementById('sA').textContent=SESS.length;document.getElementById('sS').textContent=STR.current_streak||0;
+  document.getElementById('sA').textContent=cs;document.getElementById('sS').textContent=STR.current_streak||0;
   document.getElementById('sP').textContent=Object.keys(PRs).length;document.getElementById('strN').textContent=STR.current_streak||0;
-  const xp=SESS.length*50+Object.keys(PRs).length*100+(STR.current_streak||0)*10;
+  const xp=cs*50+Object.keys(PRs).length*100+(STR.current_streak||0)*10;
   document.getElementById('xpN').textContent=xp;
   const msgs=['Tap exercises to track 💪','Good start!','Halfway! 🔥','Almost done!','Perfect week! 🏆'];
   document.getElementById('pM').textContent=msgs[Math.min(done,msgs.length-1)];
@@ -1047,8 +1085,9 @@ function rdWkOvItems(){
 }
 function rdHist(){
   const el=document.getElementById('histL');
-  if(!SESS.length){el.innerHTML='<div class="empty">No sessions yet. Complete a day!</div>';return}
-  const groups={};SESS.forEach(s=>{const d=new Date(s.completed_at);const ws=new Date(d);ws.setDate(d.getDate()-d.getDay());const k=ws.toDateString();if(!groups[k])groups[k]=[];groups[k].push(s);});
+  const hist=SESS.filter(sessDone);
+  if(!hist.length){el.innerHTML='<div class="empty">No completed days yet. Finish all exercises in a day!</div>';return}
+  const groups={};hist.forEach(s=>{const d=new Date(s.completed_at);const ws=new Date(d);ws.setDate(d.getDate()-d.getDay());const k=ws.toDateString();if(!groups[k])groups[k]=[];groups[k].push(s);});
   el.innerHTML=Object.keys(groups).map(wk=>`
     <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;margin-top:14px">Week of ${wk}</div>
     ${groups[wk].map(s=>{
@@ -1083,9 +1122,10 @@ function updWtChart(){
 
 function updSessChart(){
   const ctx=document.getElementById('sessChart');
-  if(!ctx||!SESS.length){document.getElementById('sessE').style.display='block';if(ctx)ctx.style.display='none';return}
+  const csess=SESS.filter(sessDone);
+  if(!ctx||!csess.length){document.getElementById('sessE').style.display='block';if(ctx)ctx.style.display='none';return}
   ctx.style.display='block';document.getElementById('sessE').style.display='none';
-  const wm={};SESS.forEach(s=>{const ws=s.week_start;if(!wm[ws])wm[ws]=0;wm[ws]++;});
+  const wm={};csess.forEach(s=>{const ws=s.week_start;if(!wm[ws])wm[ws]=0;wm[ws]++;});
   const sorted=Object.keys(wm).sort().slice(-10);
   const labels=sorted.map(w=>new Date(w+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}));
   const data=sorted.map(w=>wm[w]);
@@ -1118,17 +1158,29 @@ function rdCal(){
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('calT').textContent=months[calM]+' '+calY;
   const fd=new Date(calY,calM,1).getDay();const dim=new Date(calY,calM+1,0).getDate();const today=new Date();
-  const ss={};SESS.forEach(s=>{const d=new Date(s.completed_at);if(d.getFullYear()===calY&&d.getMonth()===calM)ss[d.getDate()]=s;});
+  const ss={};SESS.filter(sessDone).forEach(s=>{const d=new Date(s.completed_at);if(d.getFullYear()===calY&&d.getMonth()===calM)ss[d.getDate()]=s;});
   let cells='';
   for(let i=0;i<fd;i++)cells+='<div class="cal-c em"></div>';
   for(let d=1;d<=dim;d++){const it=today.getFullYear()===calY&&today.getMonth()===calM&&today.getDate()===d;const hs=!!ss[d];cells+=`<div class="cal-c${hs?' hs':''}${it?' td':''}">${d}</div>`;}
   document.getElementById('calG').innerHTML=cells;
-  const ms=SESS.filter(s=>{const d=new Date(s.completed_at);return d.getFullYear()===calY&&d.getMonth()===calM;});
+  const ms=SESS.filter(sessDone).filter(s=>{const d=new Date(s.completed_at);return d.getFullYear()===calY&&d.getMonth()===calM;});
   document.getElementById('calSL').innerHTML=ms.length?`<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px">${ms.length} sessions this month</div>${ms.map(s=>{const ic=DAYS.find(x=>x.id===s.day_id)?.icon||'💪';const dt=new Date(s.completed_at).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});return`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;margin-bottom:5px;display:flex;align-items:center;gap:9px"><div style="font-size:17px">${ic}</div><div><div style="font-size:12px;font-weight:600">${s.day_name}</div><div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace">${dt}</div></div></div>`;}).join('')}`:'<div class="empty" style="padding:16px">No sessions this month.</div>';
 }
 
 // RESET
-async function resetWk(){if(!confirm('Reset local week progress? (History stays saved)'))return;LS={};renderAll();toast('Week reset. Go again! 🔄');}
+async function resetWk(){
+  if(!confirm('Reset this week? This clears all ticks and weights logged this week. Completed weeks in your history stay saved.'))return;
+  const ws=getWkStart(new Date()).toISOString().split('T')[0];
+  try{
+    const{data:rows}=await sb.from('sessions').select('id').eq('user_id',CU.id).eq('week_start',ws);
+    for(const r of (rows||[])){await sb.from('exercise_logs').delete().eq('session_id',r.id);await sb.from('sessions').delete().eq('id',r.id);}
+    const{data:all}=await sb.from('sessions').select('*,exercise_logs(*)').eq('user_id',CU.id).order('completed_at',{ascending:false}).limit(200);
+    SESS=all||[];
+  }catch(e){console.warn('resetWk failed:',e);toast('Could not reset — check connection',true);return;}
+  LW={};loadWkState();renderAll();renderPRs();updateCharts();
+  document.querySelectorAll('[id^="wt-"]').forEach(el=>{el.value='';});
+  toast('Week reset. Go again! 🔄');
+}
 
 // HELPERS
 function getWkStart(d){const day=new Date(d);day.setDate(d.getDate()-d.getDay());day.setHours(0,0,0,0);return day;}
@@ -1223,6 +1275,17 @@ function switchEmTab(name){
   document.getElementById('emSheet').scrollTo({top:0,behavior:'smooth'});
 }
 
+// Recommends which Apple Watch workout type to start for a given exercise
+function watchType(exName){
+  const n=(exName||'').toLowerCase();
+  if(n.includes('treadmill'))return n.includes('walk')?{w:'Indoor Walk',tip:'Pick "Outdoor Walk" if your treadmill isn\'t recognised.'}:{w:'Indoor Run',tip:'Choose "Outdoor Run" if you ever run outside instead.'};
+  if(n.includes('cross trainer')||n.includes('elliptical'))return{w:'Elliptical',tip:'Matches the low-impact gliding cardio motion.'};
+  if(n.includes('cycling')||n.includes('bike'))return{w:'Indoor Cycle',tip:'Use "Outdoor Cycle" for road rides.'};
+  if(n.includes('battle rope')||n.includes('jump rope')||n.includes('burpee')||n.includes('thruster')||n.includes('mountain climber')||n.includes('plank to push'))return{w:'HIIT',tip:'Captures the heart-rate spikes and extra calorie burn from intervals.'};
+  if(n.includes('plank')||n.includes('crunch')||n.includes('sit-up')||n.includes('situp')||n.includes('twist')||n.includes('knee raise')||n.includes('ab wheel'))return{w:'Core Training',tip:'The best fit for focused ab and core work.'};
+  return{w:'Traditional Strength Training',tip:'The right pick for lifting weights and machine work.'};
+}
+
 function openExModal(exName, exSets) {
   const modal=document.getElementById('exModal');
   document.getElementById('emTitle').textContent=exName;
@@ -1251,6 +1314,11 @@ function renderExModal(exName,exSets,data) {
   }else{
     gifWrap.innerHTML='<div class="em-gif-none"><div class="em-gif-none-icon">🏋️</div><span>Follow the form guide below</span></div>';
   }
+
+  // ── Apple Watch workout suggestion ──
+  const wt=watchType(exName);
+  const watchEl=document.getElementById('emWatch');
+  if(watchEl)watchEl.innerHTML='<div class="em-watch-ic">⌚</div><div class="em-watch-tx"><div class="em-watch-lbl">On Apple Watch, start</div><div class="em-watch-val">'+wt.w+'</div><div class="em-watch-tip">'+wt.tip+'</div></div>';
 
   // ── FORM GUIDE tab ──
   const formPane=document.getElementById('empForm');
