@@ -13,6 +13,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// CDN fallback: if jsdelivr failed or timed out, retry from unpkg synchronously
+// (a failed load here previously killed the entire app -> blank page)
+if(typeof supabase==='undefined'){document.write('<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"><\/script>');}
+if(typeof Chart==='undefined'){document.write('<script src="https://unpkg.com/chart.js@4.4.0/dist/chart.umd.min.js"><\/script>');}
+</script>
 <style>
 :root{
   --bg:#080909;--bg2:#141716;--bg3:#1a1e1c;
@@ -630,6 +636,21 @@ tr:last-child td{border-bottom:none}
 <div id="ov" onclick="closeMenu()" style="position:fixed;inset:0;z-index:140;display:none"></div>
 
 <script>
+// Fatal-error screen: never leave the user staring at a blank page
+function showFatal(msg){
+  document.body.innerHTML='<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:#080909;color:#e2e8e3;font-family:Inter,sans-serif">'+
+    '<div style="font-size:40px">⚠️</div>'+
+    '<div style="font-size:16px;font-weight:700">My Gym couldn\'t load</div>'+
+    '<div style="font-size:13px;color:#9aa89e;max-width:320px;line-height:1.5">'+msg+'</div>'+
+    '<button onclick="location.reload()" style="margin-top:8px;background:#c8ff57;color:#080909;border:0;border-radius:12px;padding:12px 28px;font-weight:700;font-size:14px;cursor:pointer">RETRY</button></div>';
+}
+if(typeof supabase==='undefined'){
+  showFatal('The connection library failed to download. Check your internet connection and retry.');
+  throw new Error('supabase-js failed to load from both CDNs');
+}
+// Chart.js is non-critical: if it failed to load, disable charts gracefully instead of crashing later
+const HAS_CHARTS=typeof Chart!=='undefined';
+if(!HAS_CHARTS)console.warn('Chart.js unavailable — charts disabled this session');
 const SB_URL='https://hwsljzkdlznfmmlrhcrz.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3c2xqemtkbHpuZm1tbHJoY3J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MzY0NTMsImV4cCI6MjA5NjExMjQ1M30.xECaCf3q6eoIi_pdh0QSjujJpgswYJoHXltehKXAtt8';
 const sb=supabase.createClient(SB_URL,SB_KEY);
@@ -845,7 +866,14 @@ async function doAuth(){
   document.getElementById('loader').style.display='flex';
   await afterLogin();
 }
-async function doGoogle(){await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}})}
+async function doGoogle(){
+  // Redirect back to a clean URL — using location.href could carry stale
+  // auth tokens/hash fragments into the OAuth round-trip and break the return
+  try{
+    const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname}});
+    if(error)toast('Google sign-in failed: '+error.message,true);
+  }catch(e){toast('Google sign-in failed — check connection',true);}
+}
 async function doSignOut(){await sb.auth.signOut();location.reload()}
 function toggleMenu(){const m=document.getElementById('uMenu');const o=document.getElementById('ov');const s=m.style.display==='none'||!m.style.display;m.style.display=s?'block':'none';o.style.display=s?'block':'none'}
 function closeMenu(){document.getElementById('uMenu').style.display='none';document.getElementById('ov').style.display='none'}
@@ -1109,6 +1137,7 @@ const CD={plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(14,15,1
 function updateCharts(){updWtChart();updSessChart();if(aLift)updLiftChart(aLift);}
 
 function updWtChart(){
+  if(!HAS_CHARTS)return;
   const ctx=document.getElementById('wtChart');if(!ctx)return;
   if(!WL.length){document.getElementById('wtE').style.display='block';ctx.style.display='none';return}
   ctx.style.display='block';document.getElementById('wtE').style.display='none';
@@ -1121,6 +1150,7 @@ function updWtChart(){
 }
 
 function updSessChart(){
+  if(!HAS_CHARTS)return;
   const ctx=document.getElementById('sessChart');
   const csess=SESS.filter(sessDone);
   if(!ctx||!csess.length){document.getElementById('sessE').style.display='block';if(ctx)ctx.style.display='none';return}
@@ -1141,6 +1171,7 @@ function selLift(name,btn){
 }
 
 function updLiftChart(exName){
+  if(!HAS_CHARTS)return;
   const ctx=document.getElementById('liftChart');const empty=document.getElementById('liftE');if(!ctx)return;
   const pts=[];
   SESS.forEach(s=>{(s.exercise_logs||[]).forEach(el=>{if(el.exercise_name===exName&&el.weight_kg)pts.push({x:new Date(s.completed_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}),y:el.weight_kg,date:s.completed_at});});});
@@ -1374,6 +1405,13 @@ document.addEventListener('touchstart',e=>{if(exModalOpen)touchStartY=e.touches[
 document.addEventListener('touchend',e=>{if(exModalOpen&&e.changedTouches[0].clientY-touchStartY>80)closeExModal();},{passive:true});
 
 
+// Watchdog: if something unexpected keeps the loader up with nothing visible,
+// fall back to the auth screen instead of a blank/stuck page
+setTimeout(()=>{
+  if(CU)return; // logged in — a slow data load is in flight, don't yank the loader away
+  const app=document.getElementById('app'),auth=document.getElementById('authScreen');
+  if(app&&auth&&app.style.display==='none'&&auth.style.display!=='flex'){showAuth();}
+},10000);
 init();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 
