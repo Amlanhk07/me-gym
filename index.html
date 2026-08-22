@@ -145,6 +145,9 @@ hr{border:none;border-top:1px solid var(--border);margin:20px 0}
 .dv.active{display:block}
 .rest-v{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 16px;text-align:center}
 .wu{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:7px}
+.progression{background:rgba(63,255,210,.07);border:1px solid rgba(63,255,210,.22);border-radius:9px;padding:9px 12px;margin-bottom:7px;color:var(--text2);font-size:10px;line-height:1.5}
+.progression strong{color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.4px}
+.ex-up{display:block;color:var(--teal);font-size:9px;line-height:1.35;margin-top:2px}
 
 /* DAY HEADER */
 .dh{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:7px;transition:all .3s;position:relative;overflow:hidden}
@@ -656,53 +659,53 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
 const DAYS=[
-  {id:'mon',label:'MON',name:'Push Day',focus:'Chest · Shoulders · Triceps',type:'push',icon:'💪',isRest:false,exercises:[
-    {n:'Barbell Bench Press',s:'4x8-10',b:'compound',note:'Add 2.5kg when clean'},
-    {n:'Incline Dumbbell Press',s:'3x10',b:''},
-    {n:'Cable Chest Fly',s:'3x12',b:''},
-    {n:'Seated DB Shoulder Press',s:'4x10',b:'compound'},
-    {n:'Lateral Raises',s:'3x15',b:''},
-    {n:'Tricep Rope Pushdown',s:'3x12',b:''},
-    {n:'Overhead DB Tricep Ext.',s:'3x12',b:''},
-    {n:'Treadmill Incline 5 Speed 5.5',s:'20 min',b:'cardio'},
+  {id:'mon',label:'MON',name:'Upper Strength',focus:'Chest · Shoulders · Triceps',type:'push',icon:'💪',isRest:false,exercises:[
+    {n:'Barbell Bench Press',s:'4x6-8',b:'compound',note:'Add 2.5kg only when every rep is clean'},
+    {n:'Incline Dumbbell Press',s:'3x8-10',b:''},
+    {n:'Cable Chest Fly',s:'3x12-15',b:''},
+    {n:'Seated DB Shoulder Press',s:'3x8-10',b:'compound'},
+    {n:'Lateral Raises',s:'3x12-15',b:''},
+    {n:'Tricep Rope Pushdown',s:'3x10-12',b:''},
+    {n:'Treadmill Incline Walk',s:'20-25 min steady',b:'cardio'},
   ]},
-  {id:'tue',label:'TUE',name:'Pull Day',focus:'Back · Biceps · Rear Delts',type:'pull',icon:'🔙',isRest:false,exercises:[
-    {n:'Barbell Deadlift',s:'4x6',b:'compound',note:'Spine neutral always'},
-    {n:'Lat Pulldown',s:'4x10',b:''},
-    {n:'Seated Cable Row',s:'3x10',b:''},
+  {id:'tue',label:'TUE',name:'Back + Arms',focus:'Back · Biceps · Rear Delts',type:'pull',icon:'🔙',isRest:false,exercises:[
+    {n:'Barbell Deadlift',s:'3x5',b:'compound',note:'Leave 1-2 reps in reserve; spine neutral always'},
+    {n:'Lat Pulldown',s:'3x8-10',b:''},
+    {n:'Seated Cable Row',s:'3x8-10',b:''},
     {n:'Single-Arm DB Row',s:'3x10 each',b:''},
-    {n:'Face Pulls',s:'3x15',b:''},
-    {n:'Barbell Curl',s:'3x12',b:''},
-    {n:'Hammer Curl',s:'3x12',b:''},
-    {n:'Cross Trainer Resistance 7',s:'20 min',b:'cardio'},
+    {n:'Face Pulls',s:'3x12-15',b:''},
+    {n:'Barbell Curl',s:'3x10-12',b:''},
+    {n:'Hammer Curl',s:'2x12',b:''},
+    {n:'Cross Trainer Resistance 7',s:'20-25 min steady',b:'cardio'},
   ]},
   {id:'wed',label:'WED',name:'Rest Day',focus:'Recovery',type:'rest',icon:'🛌',isRest:true,exercises:[]},
-  {id:'thu',label:'THU',name:'Leg Day',focus:'Quads · Hamstrings · Glutes',type:'legs',icon:'🦵',isRest:false,exercises:[
-    {n:'Barbell Back Squat',s:'4x8',b:'compound',note:'Biggest T-boost exercise'},
-    {n:'Romanian Deadlift DB',s:'3x10',b:''},
-    {n:'Leg Press Machine',s:'3x12',b:''},
-    {n:'Leg Curl Machine',s:'3x12',b:''},
-    {n:'Walking Lunges',s:'3x12 each',b:''},
-    {n:'Standing Calf Raises',s:'4x15',b:''},
-    {n:'Cycling Sprint HIIT',s:'30s on 90s easy x10',b:'hiit'},
+  {id:'thu',label:'THU',name:'Lower Strength + Core',focus:'Legs · Glutes · Core',type:'legs',icon:'🦵',isRest:false,exercises:[
+    {n:'Barbell Back Squat',s:'4x6-8',b:'compound',note:'Brace hard; add weight only after clean reps'},
+    {n:'Romanian Deadlift DB',s:'3x8-10',b:''},
+    {n:'Leg Press Machine',s:'3x10-12',b:''},
+    {n:'Leg Curl Machine',s:'3x10-12',b:''},
+    {n:'Walking Lunges',s:'2x12 each',b:''},
+    {n:'Standing Calf Raises',s:'3x12-15',b:''},
+    {n:'Hanging Knee Raises',s:'3x10-12',b:'core'},
+    {n:'Treadmill Incline Walk',s:'15-20 min steady',b:'cardio'},
   ]},
-  {id:'fri',label:'FRI',name:'Abs + Core',focus:'Belly Fat · Core Strength',type:'abs',icon:'🎯',isRest:false,exercises:[
-    {n:'Hanging Knee Raises',s:'4x12',b:'core'},
-    {n:'Cable Crunch',s:'4x15',b:'core'},
-    {n:'Decline Sit-ups',s:'3x15',b:'core'},
-    {n:'Russian Twists weighted',s:'3x20',b:'core'},
-    {n:'Plank Hold',s:'3x45s',b:'core'},
-    {n:'Ab Wheel Rollout',s:'3x10',b:'core'},
-    {n:'Mountain Climbers',s:'3x20',b:'core'},
-    {n:'Treadmill Incline Walk',s:'25 min incline 6',b:'cardio'},
+  {id:'fri',label:'FRI',name:'Upper Muscle Builder',focus:'Chest · Back · Shoulders · Core',type:'upper',icon:'🏗️',isRest:false,exercises:[
+    {n:'Incline Dumbbell Press',s:'4x8-12',b:'compound',note:'Control the lowering phase and keep 1-2 reps in reserve'},
+    {n:'Lat Pulldown',s:'3x10-12',b:''},
+    {n:'Seated Cable Row',s:'3x10-12',b:''},
+    {n:'Cable Chest Fly',s:'3x12-15',b:''},
+    {n:'Lateral Raises',s:'3x15',b:''},
+    {n:'Tricep Rope Pushdown',s:'2x12-15',b:''},
+    {n:'Plank Hold',s:'3x45-60s',b:'core'},
+    {n:'Treadmill Incline Walk',s:'20-25 min steady',b:'cardio'},
   ]},
-  {id:'sat',label:'SAT',name:'HIIT Full Body',focus:'Max Calorie Burn',type:'hiit',icon:'🔥',isRest:false,exercises:[
-    {n:'Cycling HIIT',s:'30s sprint 90s easy x12',b:'hiit'},
-    {n:'Battle Ropes or Jump Rope',s:'3x30s on 30s rest',b:'hiit'},
-    {n:'Burpees',s:'3x10',b:'hiit'},
-    {n:'DB Thrusters squat+press',s:'3x12',b:'compound'},
-    {n:'Cross Trainer Steady State',s:'15 min res 8',b:'cardio'},
+  {id:'sat',label:'SAT',name:'Full Body Conditioning',focus:'Work Capacity · Fat Loss · Core',type:'hiit',icon:'🔥',isRest:false,exercises:[
+    {n:'DB Thrusters squat+press',s:'3x10',b:'compound'},
+    {n:'Battle Ropes or Jump Rope',s:'4x30s on 30s rest',b:'hiit'},
+    {n:'Burpees',s:'3x8-10',b:'hiit'},
+    {n:'Cycling HIIT',s:'30s hard / 90s easy x8',b:'hiit'},
     {n:'Plank to Push-up',s:'3x10',b:'core'},
+    {n:'Cross Trainer Steady State',s:'15-20 min easy-moderate',b:'cardio'},
   ]},
   {id:'sun',label:'SUN',name:'Rest Day',focus:'Mandatory recovery',type:'rest',icon:'😴',isRest:true,exercises:[]},
 ];
@@ -881,6 +884,13 @@ function closeMenu(){document.getElementById('uMenu').style.display='none';docum
 // BUILD DOM
 function buildDOM(){buildDayTabs();buildDayViews();buildPlanCards();buildWkOv();buildCalLbls();buildLiftBtns();}
 
+function progressionHint(ex){
+  if(ex.b==='compound')return'↑ Add 2.5 kg after every set reaches the top target with clean form.';
+  if(ex.b==='cardio'||ex.b==='hiit')return'↑ No extra weight: add 2–5 min or 1 round when this feels controlled.';
+  if(ex.b==='core')return'↑ Add 1–2 reps or 5–10 sec first; add load only when form stays solid.';
+  return'↑ Use the smallest increase after you hit every set cleanly for 2 workouts.';
+}
+
 function buildDayTabs(){
   document.getElementById('dayTabs').innerHTML=DAYS.map(d=>`<div class="dt${d.isRest?' rest-d':''}" id="dt-${d.id}" onclick="selDay('${d.id}')"><div class="dl">${d.label}</div><div class="dn">${d.name.split(' ')[0]}</div><div class="dd"></div></div>`).join('');
 }
@@ -891,10 +901,11 @@ function buildDayViews(){
     const exH=d.exercises.map((ex,i)=>{
       const bg=ex.b?`<span class="eb b-${ex.b}">${ex.b.toUpperCase()}</span>`:'';
       const nt=ex.note?` <em style="color:var(--teal);font-style:normal;font-size:9px">${ex.note}</em>`:'';
-      return`<li class="ex-i" id="ex-${d.id}-${i}" onclick="tgEx('${d.id}',${i})"><div class="ex-tick">&#x2713;</div><div class="ex-c"><div class="ex-n">${ex.n}</div><div class="ex-d">${ex.s}${nt}</div></div><div class="ex-r">${bg}<span class="pr-t" id="pt-${d.id}-${i}">PR</span><button class="ex-info" onclick="event.stopPropagation();openExModal('${ex.n.replace(/'/g,"\\'")}','${ex.s}')" title="View exercise guide & animation" aria-label="View exercise guide">i</button><div class="ww" onclick="event.stopPropagation()"><input class="wi" type="number" placeholder="—" min="0" max="500" step="2.5" id="wt-${d.id}-${i}" onchange="wtCh('${d.id}',${i},this.value)" inputmode="decimal"><span class="wu2">kg</span></div></div></li>`;
+      return`<li class="ex-i" id="ex-${d.id}-${i}" onclick="tgEx('${d.id}',${i})"><div class="ex-tick">&#x2713;</div><div class="ex-c"><div class="ex-n">${ex.n}</div><div class="ex-d">${ex.s}${nt}</div><span class="ex-up">${progressionHint(ex)}</span></div><div class="ex-r">${bg}<span class="pr-t" id="pt-${d.id}-${i}">PR</span><button class="ex-info" onclick="event.stopPropagation();openExModal('${ex.n.replace(/'/g,"\\'")}','${ex.s}')" title="View exercise guide & animation" aria-label="View exercise guide">i</button><div class="ww" onclick="event.stopPropagation()"><input class="wi" type="number" placeholder="—" min="0" max="500" step="2.5" id="wt-${d.id}-${i}" onchange="wtCh('${d.id}',${i},this.value)" inputmode="decimal"><span class="wu2">kg</span></div></div></li>`;
     }).join('');
     return`<div class="dv" id="dv-${d.id}">
       <div class="wu">&#x1F525; <strong style="margin-right:4px">Warm-up:</strong> 5 min treadmill + dynamic stretch</div>
+      <div class="progression"><strong>WHEN TO INCREASE WEIGHT</strong><br>Hit the top of the rep target on every set with clean form and 1–2 reps left in reserve. Then add a small amount next workout — 2.5 kg for barbell lifts, or the smallest available increase for dumbbells/machines.</div>
       <div class="dh" id="dh-${d.id}">
         <div class="dh-row"><div class="dh-info"><div class="dh-tag">${d.label} ${d.type.toUpperCase()}</div><div class="dh-name">${d.name}</div><div class="dh-focus">${d.focus}</div></div>
         <div class="dh-r"><div class="dh-cnt" id="dhc-${d.id}">0/${d.exercises.length}</div><button class="dc" id="dc-${d.id}" onclick="mDay('${d.id}')"></button></div></div>
