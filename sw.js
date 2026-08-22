@@ -1,4 +1,4 @@
-const CACHE = 'gym-v9';
+const CACHE = 'gym-v11';
 
 // App shell + external libraries needed to boot the app offline
 const CORE = [
