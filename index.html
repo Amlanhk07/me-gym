@@ -11,12 +11,10 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>My Gym</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 // CDN fallback: if jsdelivr failed or timed out, retry from unpkg synchronously
 // (a failed load here previously killed the entire app -> blank page)
-if(typeof supabase==='undefined'){document.write('<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"><\/script>');}
 if(typeof Chart==='undefined'){document.write('<script src="https://unpkg.com/chart.js@4.4.0/dist/chart.umd.min.js"><\/script>');}
 </script>
 <style>
@@ -44,29 +42,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .loader-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));width:0%;transition:width .3s ease}
 @keyframes loadfill{to{width:100%}}
 
-/* AUTH */
-#authScreen{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;display:none}
-.auth-box{width:100%;max-width:360px}
-.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:3px;color:var(--accent);text-align:center;margin-bottom:4px}
-.auth-sub{text-align:center;font-size:13px;color:var(--text3);margin-bottom:28px}
-.auth-tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:18px}
-.auth-tab{flex:1;padding:8px;text-align:center;font-size:12px;font-weight:600;border-radius:8px;cursor:pointer;color:var(--text3);transition:all .2s}
-.auth-tab.active{background:var(--accent);color:var(--bg)}
-.f{margin-bottom:13px}
-.f label{display:block;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
-.ai{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:10px;padding:11px 13px;font-size:14px;outline:none;transition:border-color .2s;font-family:'Inter',sans-serif}
-.ai:focus{border-color:rgba(200,255,87,.4)}
-.auth-btn{width:100%;background:var(--accent);color:var(--bg);border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;transition:opacity .2s}
-.auth-btn:active{opacity:.85}
-.auth-btn:disabled{opacity:.5;cursor:not-allowed}
-.auth-err{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:#ff8a94;margin-top:10px;display:none}
-.auth-err.show{display:block}
-.auth-or{text-align:center;font-size:12px;color:var(--text3);margin:14px 0;position:relative}
-.auth-or::before,.auth-or::after{content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--border)}
-.auth-or::before{left:0}.auth-or::after{right:0}
-.g-btn{width:100%;background:var(--bg2);color:var(--text2);border:1px solid var(--border2);border-radius:10px;padding:11px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:border-color .2s}
-.g-btn:active{border-color:rgba(200,255,87,.3)}
-
 /* HEADER */
 .hdr{position:sticky;top:0;z-index:100;background:rgba(8,9,9,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .hdr-inner{display:flex;align-items:center;gap:10px;padding:12px 16px;max-width:700px;margin:0 auto}
@@ -82,7 +57,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 @keyframes instPop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
 
 /* USER MENU */
-#userMenu{position:fixed;top:58px;right:14px;z-index:150;background:var(--bg2);border:1px solid var(--border2);border-radius:13px;padding:6px;min-width:175px;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+#uMenu{position:fixed;top:58px;right:14px;z-index:150;background:var(--bg2);border:1px solid var(--border2);border-radius:13px;padding:6px;min-width:175px;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6)}
 .um-info{padding:9px 11px 7px;border-bottom:1px solid var(--border);margin-bottom:3px}
 .um-name{font-size:12px;font-weight:600}
 .um-email{font-size:10px;color:var(--text3)}
@@ -425,27 +400,6 @@ tr:last-child td{border-bottom:none}
   <div class="loader-bar"><div class="loader-bar-fill"></div></div>
 </div>
 
-<div id="authScreen">
-  <div class="auth-box">
-    <div class="auth-logo">MY GYM</div>
-    <div class="auth-sub">Track your journey to 68 kg</div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="setMode('login')">Sign In</div>
-      <div class="auth-tab" onclick="setMode('signup')">Sign Up</div>
-    </div>
-    <div class="f"><label>Email</label><input class="ai" type="email" id="aEmail" placeholder="you@email.com"></div>
-    <div class="f"><label>Password</label><input class="ai" type="password" id="aPass" placeholder="Password"></div>
-    <div class="f" id="aNameF" style="display:none"><label>Name</label><input class="ai" type="text" id="aName" placeholder="e.g. Luffy"></div>
-    <button class="auth-btn" id="aBtn" onclick="doAuth()">Sign In</button>
-    <div class="auth-err" id="aErr"></div>
-    <div class="auth-or">or</div>
-    <button class="g-btn" onclick="doGoogle()">
-      <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-      Continue with Google
-    </button>
-  </div>
-</div>
-
 <div id="app" style="display:none">
   <div class="hdr">
     <div class="hdr-inner">
@@ -471,8 +425,7 @@ tr:last-child td{border-bottom:none}
   </div>
 
   <div id="uMenu">
-    <div class="um-info"><div class="um-name" id="uName">—</div><div class="um-email" id="uEmail">—</div></div>
-    <div class="um-row" onclick="doSignOut()">&#x1F6AA; Sign Out</div>
+    <div class="um-info"><div class="um-name" id="uName">My Gym</div><div class="um-email" id="uEmail">No login required</div></div>
   </div>
 
   <div class="wrap">
@@ -647,17 +600,9 @@ function showFatal(msg){
     '<div style="font-size:13px;color:#9aa89e;max-width:320px;line-height:1.5">'+msg+'</div>'+
     '<button onclick="location.reload()" style="margin-top:8px;background:#c8ff57;color:#080909;border:0;border-radius:12px;padding:12px 28px;font-weight:700;font-size:14px;cursor:pointer">RETRY</button></div>';
 }
-if(typeof supabase==='undefined'){
-  showFatal('The connection library failed to download. Check your internet connection and retry.');
-  throw new Error('supabase-js failed to load from both CDNs');
-}
 // Chart.js is non-critical: if it failed to load, disable charts gracefully instead of crashing later
 const HAS_CHARTS=typeof Chart!=='undefined';
 if(!HAS_CHARTS)console.warn('Chart.js unavailable — charts disabled this session');
-const SB_URL='https://hwsljzkdlznfmmlrhcrz.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3c2xqemtkbHpuZm1tbHJoY3J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MzY0NTMsImV4cCI6MjA5NjExMjQ1M30.xECaCf3q6eoIi_pdh0QSjujJpgswYJoHXltehKXAtt8';
-const sb=supabase.createClient(SB_URL,SB_KEY);
-
 const DAYS=[
   {id:'mon',label:'MON',name:'Upper Strength',focus:'Chest · Shoulders · Triceps',type:'push',icon:'💪',isRest:false,exercises:[
     {n:'Barbell Bench Press',s:'4x6-8',b:'compound',note:'Add 2.5kg only when every rep is clean'},
@@ -727,7 +672,7 @@ const QUOTES=[
   {text:"The pain you feel today will be the strength you feel tomorrow.",attr:"Arnold Schwarzenegger"},
   {text:"Don't count the days, make the days count.",attr:"Muhammad Ali"},
 ];
-let CU=null,LS={},LW={},SESS=[],WL=[],PRs={},STR={current_streak:0,longest_streak:0,last_session_date:null};
+let CU={id:'local-user',email:'Saved on this device',user_metadata:{name:'My Gym'}},LS={},LW={},SESS=[],WL=[],PRs={},STR={current_streak:0,longest_streak:0,last_session_date:null};
 let calY,calM,aLift=null,wChart=null,sChart=null,lChart=null;
 
 function rotateQuote(){
@@ -740,41 +685,19 @@ async function init(){
   document.getElementById('wld').value=new Date().toISOString().split('T')[0];
   calY=new Date().getFullYear();calM=new Date().getMonth();
   rotateQuote();
-
-  // INSTANT: hide loader, show auth screen immediately — no waiting
-  document.getElementById('loader').style.display='none';
-  document.getElementById('authScreen').style.display='flex';
-
-  // BACKGROUND: quietly check if user is already logged in
-  // If yes, swap to app without them needing to log in again
-  try{
-    const sessionResult=await Promise.race([
-      sb.auth.getSession(),
-      new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),5000))
-    ]);
-    if(sessionResult?.data?.session){
-      CU=sessionResult.data.session.user;
-      document.getElementById('authScreen').style.display='none';
-      document.getElementById('loader').style.display='flex';
-      document.querySelector('.loader-bar-fill').style.width='60%';
-      document.getElementById('loaderSub').textContent='LOADING YOUR DATA...';
-      await afterLogin();
-    }
-  }catch(e){
-    // Session check failed — user stays on auth screen, no problem
-    console.warn('Background session check failed:',e.message);
-  }
+  document.getElementById('loaderSub').textContent='LOADING YOUR DATA...';
+  document.querySelector('.loader-bar-fill').style.width='70%';
+  await startApp();
 }
 
-async function afterLogin(){
+async function startApp(){
   try{
     updateUserUI();
     buildDOM();
-    await loadData();
+    loadData();
   }catch(e){
-    console.error('afterLogin error:',e);
+    console.error('startApp error:',e);
   }finally{
-    // Always hide loader no matter what
     document.getElementById('loader').style.display='none';
     document.getElementById('app').style.display='block';
     const tid=['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
@@ -784,44 +707,14 @@ async function afterLogin(){
   }
 }
 
-function showAuth(){
-  document.getElementById('loader').style.display='none';
-  document.getElementById('authScreen').style.display='flex';
-}
-
 function updateUserUI(){
-  if(!CU)return;
-  const n=CU.user_metadata?.name||CU.email?.split('@')[0]||'U';
+  const n='My Gym';
   document.getElementById('uBtn').textContent=n.charAt(0).toUpperCase();
   document.getElementById('uName').textContent=n;
-  document.getElementById('uEmail').textContent=CU.email;
+  document.getElementById('uEmail').textContent='No login required';
 }
 
-async function loadData(){
-  const uid=CU.id;
-  // Each query is independent — one failing won't block the others
-  const withTimeout=(promise,ms=8000)=>Promise.race([promise,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
-  try{
-    const {data:sess}=await withTimeout(sb.from('sessions').select('*,exercise_logs(*)').eq('user_id',uid).order('completed_at',{ascending:false}).limit(200));
-    SESS=sess||[];
-  }catch(e){console.warn('sessions load failed:',e);SESS=[];}
-  try{
-    const {data:wl}=await withTimeout(sb.from('weight_logs').select('*').eq('user_id',uid).order('logged_at',{ascending:true}));
-    WL=wl||[];
-  }catch(e){console.warn('weight_logs load failed:',e);WL=[];}
-  try{
-    const {data:prs}=await withTimeout(sb.from('personal_records').select('*').eq('user_id',uid));
-    PRs={};(prs||[]).forEach(p=>{PRs[p.exercise_name]=p});
-  }catch(e){console.warn('PRs load failed:',e);PRs={};}
-  try{
-    const {data:str}=await withTimeout(sb.from('streaks').select('*').eq('user_id',uid).single());
-    if(str)STR=str;
-  }catch(e){console.warn('streak load failed:',e);}
-  // Ensure profile + streak row exist for new users
-  try{
-    await sb.from('profiles').upsert({id:uid,email:CU.email},{onConflict:'id',ignoreDuplicates:true});
-    await sb.from('streaks').upsert({user_id:uid},{onConflict:'user_id',ignoreDuplicates:true});
-  }catch(e){console.warn('profile upsert failed:',e);}
+function loadData(){
   loadWkState();renderAll();renderPRs();updateCharts();
 }
 
@@ -842,42 +735,6 @@ function loadWkState(){
   });
 }
 
-// AUTH
-let AM='login';
-function setMode(m){
-  AM=m;
-  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',i===(m==='login'?0:1)));
-  document.getElementById('aBtn').textContent=m==='login'?'Sign In':'Create Account';
-  document.getElementById('aNameF').style.display=m==='signup'?'block':'none';
-  document.getElementById('aErr').classList.remove('show');
-}
-async function doAuth(){
-  const email=document.getElementById('aEmail').value.trim();
-  const pass=document.getElementById('aPass').value;
-  const btn=document.getElementById('aBtn');const err=document.getElementById('aErr');
-  if(!email||!pass){err.textContent='Fill in all fields.';err.classList.add('show');return}
-  btn.disabled=true;btn.textContent='Please wait...';err.classList.remove('show');
-  let res;
-  if(AM==='signup'){
-    const name=document.getElementById('aName').value.trim();
-    res=await sb.auth.signUp({email,password:pass,options:{data:{name}}});
-    if(!res.error&&res.data.user)await sb.from('profiles').upsert({id:res.data.user.id,email,name});
-  }else{res=await sb.auth.signInWithPassword({email,password:pass});}
-  if(res.error){err.textContent=res.error.message;err.classList.add('show');btn.disabled=false;btn.textContent=AM==='login'?'Sign In':'Create Account';return}
-  CU=res.data.user;
-  document.getElementById('authScreen').style.display='none';
-  document.getElementById('loader').style.display='flex';
-  await afterLogin();
-}
-async function doGoogle(){
-  // Redirect back to a clean URL — using location.href could carry stale
-  // auth tokens/hash fragments into the OAuth round-trip and break the return
-  try{
-    const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname}});
-    if(error)toast('Google sign-in failed: '+error.message,true);
-  }catch(e){toast('Google sign-in failed — check connection',true);}
-}
-async function doSignOut(){await sb.auth.signOut();location.reload()}
 function toggleMenu(){const m=document.getElementById('uMenu');const o=document.getElementById('ov');const s=m.style.display==='none'||!m.style.display;m.style.display=s?'block':'none';o.style.display=s?'block':'none'}
 function closeMenu(){document.getElementById('uMenu').style.display='none';document.getElementById('ov').style.display='none'}
 
@@ -901,7 +758,7 @@ function buildDayViews(){
     const exH=d.exercises.map((ex,i)=>{
       const bg=ex.b?`<span class="eb b-${ex.b}">${ex.b.toUpperCase()}</span>`:'';
       const nt=ex.note?` <em style="color:var(--teal);font-style:normal;font-size:9px">${ex.note}</em>`:'';
-      return`<li class="ex-i" id="ex-${d.id}-${i}" onclick="tgEx('${d.id}',${i})"><div class="ex-tick">&#x2713;</div><div class="ex-c"><div class="ex-n">${ex.n}</div><div class="ex-d">${ex.s}${nt}</div><span class="ex-up">${progressionHint(ex)}</span></div><div class="ex-r">${bg}<span class="pr-t" id="pt-${d.id}-${i}">PR</span><button class="ex-info" onclick="event.stopPropagation();openExModal('${ex.n.replace(/'/g,"\\'")}','${ex.s}')" title="View exercise guide & animation" aria-label="View exercise guide">i</button><div class="ww" onclick="event.stopPropagation()"><input class="wi" type="number" placeholder="—" min="0" max="500" step="2.5" id="wt-${d.id}-${i}" onchange="wtCh('${d.id}',${i},this.value)" inputmode="decimal"><span class="wu2">kg</span></div></div></li>`;
+      return`<li class="ex-i" id="ex-${d.id}-${i}" onclick="tgEx('${d.id}',${i})"><div class="ex-tick">&#x2713;</div><div class="ex-c"><div class="ex-n">${ex.n}</div><div class="ex-d">${ex.s}${nt}</div><span class="ex-up">${progressionHint(ex)}</span></div><div class="ex-r">${bg}<span class="pr-t" id="pt-${d.id}-${i}">PR</span><button class="ex-info" onclick="event.stopPropagation();openExModal('${ex.n.replace(/'/g,"\\'")}','${ex.s}')" title="View exercise guide & animation" aria-label="View exercise guide">i</button><div class="ww" onclick="event.stopPropagation()"><input class="wi" type="number" placeholder="—" min="0" max="500" step="2.5" id="wt-${d.id}-${i}" oninput="wtCh('${d.id}',${i},this.value)" inputmode="decimal"><span class="wu2">kg</span></div></div></li>`;
     }).join('');
     return`<div class="dv" id="dv-${d.id}">
       <div class="wu">&#x1F525; <strong style="margin-right:4px">Warm-up:</strong> 5 min treadmill + dynamic stretch</div>
@@ -1003,9 +860,7 @@ async function wtCh(day,idx,val){
   if(wkg>0){
     const prev=PRs[exName];
     if(!prev||wkg>parseFloat(prev.weight_kg)){
-      const{data:s}=await sb.from('sessions').select('id').eq('user_id',CU.id).eq('day_id',day).order('completed_at',{ascending:false}).limit(1);
-      await sb.from('personal_records').upsert({user_id:CU.id,exercise_name:exName,weight_kg:wkg,reps:d.exercises[idx].s,achieved_at:new Date().toISOString(),session_id:s?.[0]?.id||null},{onConflict:'user_id,exercise_name'});
-      PRs[exName]={weight_kg:wkg,achieved_at:new Date().toISOString()};
+      PRs[exName]={exercise_name:exName,weight_kg:wkg,reps:d.exercises[idx].s,achieved_at:new Date().toISOString()};
       document.getElementById('pt-'+day+'-'+idx)?.classList.add('show');
       toast(TP[~~(Math.random()*TP.length)]);
       document.getElementById('sP').textContent=Object.keys(PRs).length;
@@ -1018,44 +873,30 @@ function ldWts(day){
   const d=DAYS.find(x=>x.id===day);
   d.exercises.forEach((ex,i)=>{const t=document.getElementById('pt-'+day+'-'+i);if(t){(PRs[ex.n]&&LW[day]?.[i]&&LW[day][i]>=PRs[ex.n]?.weight_kg)?t.classList.add('show'):t.classList.remove('show')}});
 }
-function svNt(day,val){if(!LS[day])LS[day]={ex:{},done:false};LS[day].notes=val;}
+function svNt(day,val){if(!LS[day])LS[day]={ex:{},done:false};LS[day].notes=val;syncSess(day);}
 function ldNt(day){const el=document.getElementById('nt-'+day);if(el&&LS[day]?.notes)el.value=LS[day].notes;}
 
-// SYNC
-// Per-day write queue + revision guard: rapid taps are serialized so destructive
-// writes never overlap, and only the most recent change refreshes shared state.
-const _syncQ={};const _syncRev={};
 function syncSess(day){
-  const rev=(_syncRev[day]=(_syncRev[day]||0)+1);
-  const run=async()=>{
-    showSync(true);
-    const d=DAYS.find(x=>x.id===day);
-    const ws=getWkStart(new Date()).toISOString().split('T')[0];
-    const anyDone=Object.values(LS[day]?.ex||{}).some(Boolean);
-    try{
-      if(!anyDone){
-        // Nothing ticked for this day this week — remove any saved session so it resets cleanly
-        const{data:rows}=await sb.from('sessions').select('id').eq('user_id',CU.id).eq('day_id',day).eq('week_start',ws);
-        for(const r of (rows||[])){await sb.from('exercise_logs').delete().eq('session_id',r.id);await sb.from('sessions').delete().eq('id',r.id);}
-      }else{
-        const{data:sess,error}=await sb.from('sessions').upsert({user_id:CU.id,day_id:day,day_name:d.name,completed_at:new Date().toISOString(),week_start:ws,notes:LS[day]?.notes||''},{onConflict:'user_id,day_id,week_start'}).select().single();
-        if(error)throw error;
-        if(sess){
-          await sb.from('exercise_logs').delete().eq('session_id',sess.id);
-          const wts=LW[day]||{};
-          await sb.from('exercise_logs').insert(d.exercises.map((ex,i)=>({session_id:sess.id,user_id:CU.id,exercise_name:ex.n,sets:3,reps:ex.s,weight_kg:wts[i]||null,completed:!!LS[day]?.ex?.[i]})));
-        }
-      }
-      // Only the newest queued change is allowed to refresh the shared session list
-      if(rev===_syncRev[day]){
-        const{data:all}=await sb.from('sessions').select('*,exercise_logs(*)').eq('user_id',CU.id).order('completed_at',{ascending:false}).limit(200);
-        SESS=all||[];document.getElementById('sA').textContent=SESS.filter(sessDone).length;
-      }
-    }catch(e){console.warn('syncSess failed:',e);toast('Could not save — check connection',true);}
-    finally{if(rev===_syncRev[day])showSync(false);}
-  };
-  _syncQ[day]=(_syncQ[day]||Promise.resolve()).then(run,run);
-  return _syncQ[day];
+  showSync(true);
+  const d=DAYS.find(x=>x.id===day);
+  const ws=getWkStart(new Date()).toISOString().split('T')[0];
+  const anyDone=Object.values(LS[day]?.ex||{}).some(Boolean);
+  const existing=SESS.findIndex(s=>s.day_id===day&&s.week_start===ws);
+  if(!anyDone){
+    if(existing>=0)SESS.splice(existing,1);
+  }else{
+    const session={
+      id:'local-'+ws+'-'+day,day_id:day,day_name:d.name,week_start:ws,
+      completed_at:new Date().toISOString(),notes:LS[day]?.notes||'',
+      exercise_logs:d.exercises.map((ex,i)=>({
+        exercise_name:ex.n,sets:3,reps:ex.s,weight_kg:LW[day]?.[i]||null,completed:!!LS[day]?.ex?.[i]
+      }))
+    };
+    if(existing>=0)SESS[existing]=session;else SESS.unshift(session);
+  }
+  document.getElementById('sA').textContent=SESS.filter(sessDone).length;
+  showSync(false);
+  return Promise.resolve();
 }
 function showSync(on){const d=document.getElementById('sd');if(d)d.style.display=on?'inline-block':'none';}
 
@@ -1064,11 +905,11 @@ async function logWt(){
   const v=parseFloat(document.getElementById('wlv').value);
   const dt=document.getElementById('wld').value;
   if(!v||v<30||v>300){toast('Enter valid weight',true);return}
-  const{error}=await sb.from('weight_logs').upsert({user_id:CU.id,weight:v,logged_at:dt},{onConflict:'user_id,logged_at'});
-  if(!error){
-    const{data:wl}=await sb.from('weight_logs').select('*').eq('user_id',CU.id).order('logged_at',{ascending:true});
-    WL=wl||[];toast('Weight logged! 📊');document.getElementById('wlv').value='';updateCharts();
-  }else toast('Error saving',true);
+  const entry={weight:v,logged_at:dt};
+  const existing=WL.findIndex(w=>w.logged_at===dt);
+  if(existing>=0)WL[existing]=entry;else WL.push(entry);
+  WL.sort((a,b)=>a.logged_at.localeCompare(b.logged_at));
+  toast('Weight logged! 📊');document.getElementById('wlv').value='';updateCharts();
 }
 
 // STREAK
@@ -1078,7 +919,6 @@ async function bumpStr(){
   const yest=new Date(Date.now()-86400000).toISOString().split('T')[0];
   const nc=(STR.last_session_date===yest)?(STR.current_streak||0)+1:1;
   STR.current_streak=nc;STR.last_session_date=today;STR.longest_streak=Math.max(STR.longest_streak||0,nc);
-  await sb.from('streaks').upsert({user_id:CU.id,...STR,updated_at:new Date().toISOString()},{onConflict:'user_id'});
   document.getElementById('strN').textContent=nc;document.getElementById('sS').textContent=nc;
 }
 
@@ -1213,12 +1053,7 @@ function rdCal(){
 async function resetWk(){
   if(!confirm('Reset this week? This clears all ticks and weights logged this week. Completed weeks in your history stay saved.'))return;
   const ws=getWkStart(new Date()).toISOString().split('T')[0];
-  try{
-    const{data:rows}=await sb.from('sessions').select('id').eq('user_id',CU.id).eq('week_start',ws);
-    for(const r of (rows||[])){await sb.from('exercise_logs').delete().eq('session_id',r.id);await sb.from('sessions').delete().eq('id',r.id);}
-    const{data:all}=await sb.from('sessions').select('*,exercise_logs(*)').eq('user_id',CU.id).order('completed_at',{ascending:false}).limit(200);
-    SESS=all||[];
-  }catch(e){console.warn('resetWk failed:',e);toast('Could not reset — check connection',true);return;}
+  SESS=SESS.filter(s=>s.week_start!==ws);
   LW={};loadWkState();renderAll();renderPRs();updateCharts();
   document.querySelectorAll('[id^="wt-"]').forEach(el=>{el.value='';});
   toast('Week reset. Go again! 🔄');
@@ -1235,27 +1070,8 @@ function toast(msg,isErr=false){
   clearTimeout(TT);TT=setTimeout(()=>el.classList.remove('show'),2400);
 }
 
-// Offline awareness — the app shell and guides work offline; data syncs when back online
-window.addEventListener('offline',()=>toast('📴 Offline — guides still work, changes sync later'));
+window.addEventListener('offline',()=>toast('📴 Offline — your routine is still available'));
 window.addEventListener('online',()=>toast('🟢 Back online'));
-
-// AUTH LISTENER
-sb.auth.onAuthStateChange(async(event,session)=>{
-  if(event==='SIGNED_IN'&&session&&!CU){
-    CU=session.user;
-    document.getElementById('authScreen').style.display='none';
-    document.getElementById('loader').style.display='flex';
-    // Small delay to let Supabase settle after OAuth redirect
-    setTimeout(async()=>{ await afterLogin(); },300);
-  }
-  // Handle token refresh failures gracefully
-  if(event==='TOKEN_REFRESHED'&&!session){
-    console.warn('Token refresh failed — signing out');
-    CU=null;
-    document.getElementById('app').style.display='none';
-    showAuth();
-  }
-});
 
 // ═══════════════════════════════════════
 // EXERCISE GUIDE — self-contained local data + bundled animated GIFs
@@ -1416,12 +1232,10 @@ document.addEventListener('touchstart',e=>{if(exModalOpen)touchStartY=e.touches[
 document.addEventListener('touchend',e=>{if(exModalOpen&&e.changedTouches[0].clientY-touchStartY>80)closeExModal();},{passive:true});
 
 
-// Watchdog: if something unexpected keeps the loader up with nothing visible,
-// fall back to the auth screen instead of a blank/stuck page
+// Watchdog: never leave the user on a stuck loader.
 setTimeout(()=>{
-  if(CU)return; // logged in — a slow data load is in flight, don't yank the loader away
-  const app=document.getElementById('app'),auth=document.getElementById('authScreen');
-  if(app&&auth&&app.style.display==='none'&&auth.style.display!=='flex'){showAuth();}
+  const app=document.getElementById('app');
+  if(app&&app.style.display==='none')showFatal('The app took too long to start. Retry to load your routine.');
 },10000);
 init();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
