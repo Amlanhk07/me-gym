@@ -1,9 +1,8 @@
-const CACHE = 'gym-v11';
+const CACHE = 'gym-v12';
 
 // App shell + external libraries needed to boot the app offline
 const CORE = [
   '/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png',
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
   'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap'
 ];
@@ -34,11 +33,6 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
-
-  const url = new URL(req.url);
-
-  // Always let Supabase API / auth traffic hit the network (live data, never cache)
-  if (url.hostname.endsWith('supabase.co')) return;
 
   // HTML navigations: network-first so the app stays fresh, fall back to cache offline
   if (req.mode === 'navigate') {
